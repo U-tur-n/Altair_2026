@@ -42,7 +42,7 @@ void setPage1() {
   Wire.beginTransmission(deviceAddress);
   Wire.write(pageIDAddress);
   Wire.write(page1);
-  Wire.endTransmission(true);
+  Wire.endTransmission(false);
   delay(25);
 }
 
@@ -51,7 +51,7 @@ void setAccRange() {
   Wire.beginTransmission(deviceAddress);
   Wire.write(acc_configAddress);
   Wire.write(accRange16g);
-  Wire.endTransmission(true);
+  Wire.endTransmission(false);
 
 
   //値の読み取り, シリアルモニタへの書き出し
