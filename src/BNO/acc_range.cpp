@@ -18,7 +18,7 @@ void setAccRange(void);
 void setPage1(void);
 
 namespace BNO{
-  begin(){
+  void begin(){
   // put your setup code here, to run once:
   Wire.begin();
   Serial.begin(115200);
