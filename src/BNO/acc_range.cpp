@@ -2,22 +2,23 @@
 
 #include <Wire.h>
 
-uint8_t deviceAddress = 0x28;
+uint8_t deviceAddress = 0x28; //BNOデバイスアドレス
 uint8_t oprModeAddress = 0x3D; //オペレーションモード変更アドレス
 uint8_t configMode = 0x00; //コンフィグモード設定値
 uint8_t fusionMode = 0x0C; //フュージョンモード設定値
 uint8_t pageIDAddress = 0X07; //レジスタマップ変更アドレス
-uint8_t page0 = 0x00;
-uint8_t page1 = 0x01;
+uint8_t page0 = 0x00; //ページ0変更アドレス
+uint8_t page1 = 0x01;//ページ1変更アドレス
 uint8_t acc_configAddress = 0x08; //加速度設定変更アドレス
 uint8_t accRange16g = 0b00001111; //オペレーションモード:ノーマル, バンド幅:62.5Hz, 加速度検出レンジ:16G
-uint8_t acc_configAddressData;
+uint8_t acc_configAddressData;  // 現在加速度設定の値格納用
 
 void setConfigMode(void);
 void setAccRange(void);
 void setPage1(void);
 
-void setup() {
+namespace BNO{
+  begin(){
   // put your setup code here, to run once:
   Wire.begin();
   Serial.begin(115200);
@@ -26,7 +27,7 @@ void setup() {
   setAccRange(); //加速度検出レンジを16Gに変更し，レジスタの値をシリアルモニタに表示する。
 }
 
-void loop() {
+void execute() {
   // put your main code here, to run repeatedly:
 
 }
@@ -62,4 +63,5 @@ void setAccRange() {
   acc_configAddressData = Wire.read();
   Serial.println(acc_configAddressData, BIN);
   delay(25);
+}
 }
