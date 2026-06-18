@@ -13,13 +13,15 @@
 // 同一SPIバス上のMicroSDスロットのCSピン（衝突防止用）
 #define SD_CS     3 
 
+namespace BME{
 // ソフトウェアSPIでBME280のインスタンスを生成
 Adafruit_BME280 bme(BME_CS, BME_MOSI, BME_MISO, BME_SCLK);
 
 // 打ち上げ地点の基準気圧（0m補正用変数）
 float launchPressure = 1013.25; 
+float lastTime = 0.0;
 
-void setup() {
+void begin() {
   Serial.begin(115200);
 delay(1000); // シリアルモニタが開くまで待機
 
@@ -50,16 +52,18 @@ delay(1000); // シリアルモニタが開くまで待機
   Serial.println("---------------------------------------");
 }
 
-void loop() {
+void execute() {
   // --- 仕様書で定義された変数名 ---
-  float pressure = bme.readPressure() / 100.0F;     // 気圧 [hPa]
+  
+  if (millis() - lastTime >= 1000){
+  // float pressure = bme.readPressure() / 100.0F;     // 気圧 [hPa]
   float altitude = bme.readAltitude(launchPressure); // 高度 [m] (打ち上げ地点を0mとして算出)
   float temperature = bme.readTemperature();         // 温度 [°C] (気圧センサ内蔵)
 
   // シリアルモニタへの出力（デバッグ用）
-  Serial.print("気圧 [pressure]: ");
-  Serial.print(pressure);
-  Serial.print(" hPa | ");
+  // Serial.print("気圧 [pressure]: ");
+  // Serial.print(pressure);
+  // Serial.print(" hPa | ");
 
   Serial.print("高度 [altitude]: ");
   Serial.print(altitude);
@@ -69,5 +73,8 @@ void loop() {
   Serial.print(temperature);
   Serial.println(" °C");
 
-  delay(1000); // 1秒ごとに計測
+  lastTime = millis();
+  }
+}
+
 }
