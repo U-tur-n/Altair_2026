@@ -53,8 +53,14 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   if(millis() - lastTime >= 100){
-  BME::execute();
-  data();
+    measureData.push_back(millis());
+    Serial.print(millis());
+    Serial.print(", ");
+    BME::execute();
+    measureData.push_back(BME::altitude);
+    Serial.print(BME::altitude);
+    Serial.println("");
+    data();
   }
 }
 
