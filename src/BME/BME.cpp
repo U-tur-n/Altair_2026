@@ -56,26 +56,11 @@ delay(1000); // シリアルモニタが開くまで待機
 void execute() {
   // --- 仕様書で定義された変数名 ---
   
-  if (millis() - lastTime >= 1000){
+
   // float pressure = bme.readPressure() / 100.0F;     // 気圧 [hPa]
   float altitude = bme.readAltitude(launchPressure); // 高度 [m] (打ち上げ地点を0mとして算出)
   float temperature = bme.readTemperature();         // 温度 [°C] (気圧センサ内蔵)
 
-  // シリアルモニタへの出力（デバッグ用）
-  // Serial.print("気圧 [pressure]: ");
-  // Serial.print(pressure);
-  // Serial.print(" hPa | ");
-
-  Serial.print("高度 [altitude]: ");
-  Serial.print(altitude);
-  Serial.print(" m | ");
-
-  Serial.print("温度: ");
-  Serial.print(temperature);
-  Serial.println(" °C");
-
-  lastTime = millis();
-  }
 }
 
 }
