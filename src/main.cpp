@@ -9,7 +9,7 @@
 unsigned long lastTime = 0;
 
 std::vector<float> measureData;
-FILE fp;
+File fp;
 char fileName[] = "data.csv";
 
 // put function declarations here:
@@ -25,9 +25,9 @@ void setup() {
   Serial.print("Initializing SD card...");
     if (SD.begin(cs_SD) == false) {
     Serial.println("SD card faile ro not present");
-    }
     while (1)
       ;
+    }
 
   BME::begin();
 
@@ -37,7 +37,7 @@ void setup() {
 
   //タクトスイッチが押されたら計測開始
   Serial.print("Opening the file...");
-  fp = SD.open(fileName, "FILE_WRITE");
+  fp = SD.open(fileName, FILE_WRITE);
   if (fp == false) {
     Serial.println("cannot open the file");
     while (1)
@@ -45,7 +45,7 @@ void setup() {
   }
   
   Serial.println("Ready...");
-  while (tact)
+  while (digitalRead(tact))
     ;
   
 }
