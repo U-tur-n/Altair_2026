@@ -12,7 +12,7 @@
 #define BME_CS    D2
 
 // 同一SPIバス上のMicroSDスロットのCSピン（衝突防止用）
-#define SD_CS     3 
+#define SD_CS     21
 
 namespace BME{
 // ソフトウェアSPIでBME280のインスタンスを生成
