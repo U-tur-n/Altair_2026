@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "BME/BME.h"
 
 // put function declarations here:
 
