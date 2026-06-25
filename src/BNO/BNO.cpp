@@ -29,3 +29,5 @@ void execute(){
 
   // クォータニオン 
   imu::Quaternion q = bno.getQuat();
+}
+}
