@@ -5,7 +5,8 @@
 #include <TinyGPS++.h>
 
 namespace GPS{
-    extern float ;
+    extern float latitude;
+    extern float longtitude;
     void begin();
     void execute();
 }
