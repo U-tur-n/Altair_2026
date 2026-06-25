@@ -26,7 +26,8 @@ void begin() {  //setup()の代わり
 
   Serial.println("Goodnight moon!");
 
-  // set the data rate for the SoftwareSerial port
+
+  // set the data rate for the SoftwareSerial port!git s
   Serial1.begin(9600, SERIAL_8N1, RX1_PIN, TX1_PIN);
   Serial1.println("Hello, world?");
 }
