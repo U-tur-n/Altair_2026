@@ -1,26 +1,29 @@
-#include "BME.h"
 #include <Arduino.h>
 #include <Wire.h>
 #include <SPI.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
+#include "BME.h"
 
 // --- 仕様書に基づくピンアサインの設定 ---
 #define BME_SCLK  D8
 #define BME_MISO  D9
 #define BME_MOSI D10
-#define BME_CS    D2
+#define cs 3 //D2
+
 
 // 同一SPIバス上のMicroSDスロットのCSピン（衝突防止用）
-#define SD_CS     3 
+#define SD_CS 4 //D3
 
 namespace BME{
 // ソフトウェアSPIでBME280のインスタンスを生成
-Adafruit_BME280 bme(BME_CS, BME_MOSI, BME_MISO, BME_SCLK);
+Adafruit_BME280 bme(cs, BME_MOSI, BME_MISO, BME_SCLK);
 
 // 打ち上げ地点の基準気圧（0m補正用変数）
 float launchPressure = 1013.25; 
 float lastTime = 0.0;
+
+float altitude;
 
 void begin() {
   Serial.begin(115200);
@@ -58,7 +61,7 @@ void execute() {
   
 
   // float pressure = bme.readPressure() / 100.0F;     // 気圧 [hPa]
-  float altitude = bme.readAltitude(launchPressure); // 高度 [m] (打ち上げ地点を0mとして算出)
+  altitude = bme.readAltitude(launchPressure); // 高度 [m] (打ち上げ地点を0mとして算出)
   float temperature = bme.readTemperature();         // 温度 [°C] (気圧センサ内蔵)
 
 }
