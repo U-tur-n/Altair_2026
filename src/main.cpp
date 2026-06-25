@@ -21,6 +21,8 @@ void setup() {
   pinMode(cs_SD, OUTPUT);
   pinMode(tact, INPUT_PULLUP);
 
+  
+  Serial.begin(115200);
   //SD初期化
   Serial.print("Initializing SD card...");
     if (SD.begin(cs_SD) == false) {
@@ -37,15 +39,16 @@ void setup() {
 
   //タクトスイッチが押されたら計測開始
   Serial.print("Opening the file...");
-  fp = SD.open(fileName, FILE_WRITE);
+  fp = SD.open(fileName, "FILE_WRITE");
   if (fp == false) {
     Serial.println("cannot open the file");
     while (1)
       ;
   }
   
-  Serial.println("Ready...");
-  while (digitalRead(tact))
+  Serial.println("receive any key...");
+  while (Serial.available() == 0)
+    ;
     ;
   
 }
@@ -57,8 +60,9 @@ void loop() {
     Serial.print(millis());
     Serial.print(", ");
     BME::execute();
-    measureData.push_back(BME::altitude);
-    Serial.print(BME::altitude);
+    float altitude = BME::altitude;
+    measureData.push_back(altitude);
+    Serial.print(altitude);
     Serial.println("");
     data();
   }
@@ -71,7 +75,11 @@ void data() {
     fp.println(data);
     fp.close();
     Serial.println("saved data");
-    while (1);
+    // Serial.println("receive any key...");
+    if (Serial.available() != 0){
+      while(1)
+        ;
+    }
   }
 }
 
