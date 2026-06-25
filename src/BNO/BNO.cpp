@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <bno055.h>
+#include <Adafruit_bno055.h>
 
 namespace BNO {
 
