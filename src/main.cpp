@@ -80,6 +80,10 @@ SPI.begin();
     while (1)
       ;
   }
+  Serial.println("OK");
+  Serial.println("press the tact switch...");
+  while(digitalRead(tact) == HIGH)
+    ;
 }
 
 void loop() {
@@ -121,7 +125,10 @@ void loop() {
     Serial.println(az);
     // Serial.print(", ");
     // Serial.println(q);
-    if(measureData.size() >= 2100 || digitalRead(tact) == LOW){
+    if(digitalRead(tact) == LOW){
+      save(true);
+    }
+    if(measureData.size() >= 2100){
       save(false);
     }
   lastTime = millis();
