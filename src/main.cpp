@@ -5,7 +5,7 @@
 #include "BNO/BNO.h"
 #include "GPS/GPS.h"
 
-#define tact D0
+#define tact 1 // D0
 #define cs_SD 21
 
 unsigned long lastTime = 0;
@@ -78,7 +78,7 @@ void loop() {
     measureData.push_back(ay); 
     measureData.push_back(az);
     measureData.push_back(q);
-    
+
     Serial.print(altitude);
     Serial.println("");
     data();

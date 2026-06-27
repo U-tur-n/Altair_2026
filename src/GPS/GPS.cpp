@@ -40,11 +40,11 @@ void execute() {  // run over and over
     //Serial.print(c);
     gps.encode(c);
     if (gps.location.isUpdated()) {
-      Serial.print(millis());
-      Serial.print(", ");
-      Serial.print(gps.location.lat(), 6);
-      Serial.print(", ");
-      Serial.println(gps.location.lng(), 6);
+      // Serial.print(millis());
+      // Serial.print(", ");
+      // Serial.print(gps.location.lat(), 6);
+      // Serial.print(", ");
+      // Serial.println(gps.location.lng(), 6);
     }
   }
 }

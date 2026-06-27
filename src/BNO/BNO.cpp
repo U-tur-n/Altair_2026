@@ -22,10 +22,10 @@ void execute(){
   float ay = a.y();
   float az = a.z();
 
-  Serial.print("Accel: ");
-  Serial.print(ax); Serial.print(", ");
-  Serial.print(ay); Serial.print(", ");
-  Serial.println(az);
+  // Serial.print("Accel: ");
+  // Serial.print(ax); Serial.print(", ");
+  // Serial.print(ay); Serial.print(", ");
+  // Serial.println(az);
 
   // クォータニオン 
   imu::Quaternion q = bno.getQuat();
