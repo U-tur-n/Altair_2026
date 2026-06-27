@@ -15,7 +15,7 @@ File fp;
 char fileName[] = "/data.csv";
 
 // put function declarations here:
-void data();
+void save(bool);
 
 void setup() {
   // put your setup code here, to run once:
