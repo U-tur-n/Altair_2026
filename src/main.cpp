@@ -118,13 +118,14 @@ void loop() {
     Serial.print(", ");
     Serial.print(ay);
     Serial.print(", ");
-    Serial.print(az);
+    Serial.println(az);
     // Serial.print(", ");
     // Serial.println(q);
     if(measureData.size() >= 2100 || digitalRead(tact) == LOW){
       save(false);
     }
   }
+  lastTime = millis();
 }
 
 // put function definitions here:
