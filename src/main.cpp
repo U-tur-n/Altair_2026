@@ -63,29 +63,47 @@ void loop() {
     measureData.push_back(millis());
     Serial.print(millis());
     Serial.print(", ");
+
     BME::execute();
+    GPS::execute();
+    BNO::execute();
     float altitude = BME::altitude;
-    measureData.push_back(altitude);
     float latitude = GPS::latitude;
     float longitude = GPS::longitude;
-    measureData.push_back(latitude);
-    measureData.push_back(longitude);
     float ax = BNO::ax;
     float ay = BNO::ay;
     float az = BNO::az;
     float q = BNO::q;
+
+    measureData.push_back(altitude);
+    measureData.push_back(latitude);
+    measureData.push_back(longitude);
     measureData.push_back(ax);
     measureData.push_back(ay); 
     measureData.push_back(az);
     measureData.push_back(q);
 
     Serial.print(altitude);
-    Serial.println("");
-    data();
+    Serial.print(", ");
+    Serial.print(latitude);
+    Serial.print(", ");
+    Serial.print(longitude);
+    Serial.print(", ");
+    Serial.print(ax);
+    Serial.print(", ");
+    Serial.print(ay);
+    Serial.print(", ");
+    Serial.print(az);
+    Serial.print(", ");
+    Serial.println(q);
+    if(measureData.size() >= 2100 || digitalRead(tact) == LOW){
+      save();
+    }
   }
 }
 
-void data() {
+// put function definitions here:
+void save() {
   for (double data : measureData) {
     fp.print(data);
     fp.print(",");
@@ -99,5 +117,3 @@ void data() {
     }
   }
 }
-
-// put function definitions here:
