@@ -10,7 +10,7 @@ unsigned long lastTime = 0;
 
 std::vector<float> measureData;
 File fp;
-char fileName[] = "data.csv";
+char fileName[] = "/data.csv";
 
 // put function declarations here:
 void data();
@@ -39,7 +39,7 @@ void setup() {
 
   //タクトスイッチが押されたら計測開始
   Serial.print("Opening the file...");
-  fp = SD.open(fileName, "FILE_WRITE");
+  fp = SD.open(fileName, FILE_WRITE);
   if (fp == false) {
     Serial.println("cannot open the file");
     while (1)
