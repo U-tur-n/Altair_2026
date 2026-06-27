@@ -66,6 +66,19 @@ void loop() {
     BME::execute();
     float altitude = BME::altitude;
     measureData.push_back(altitude);
+    float latitude = GPS::latitude;
+    float longitude = GPS::longitude;
+    measureData.push_back(latitude);
+    measureData.push_back(longitude);
+    float ax = BNO::ax;
+    float ay = BNO::ay;
+    float az = BNO::az;
+    float q = BNO::q;
+    measureData.push_back(ax);
+    measureData.push_back(ay); 
+    measureData.push_back(az);
+    measureData.push_back(q);
+    
     Serial.print(altitude);
     Serial.println("");
     data();
