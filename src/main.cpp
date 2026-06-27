@@ -124,8 +124,8 @@ void loop() {
     if(measureData.size() >= 2100 || digitalRead(tact) == LOW){
       save(false);
     }
-  }
   lastTime = millis();
+  }
 }
 
 // put function definitions here:
