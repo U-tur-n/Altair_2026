@@ -55,3 +55,13 @@ document.querySelector('.btn-sd').addEventListener('click', function() {
         alert("マイコンと接続されていません！");
     }
 });
+
+// 「電装動作」ボタンのクリックイベント
+// document.querySelector('.btn-pwr').addEventListener('click', function() {
+//     if (websocket && websocket.readyState === WebSocket.OPEN) {
+//         websocket.send("CMD_PWR");
+//         console.log("Sent: CMD_PWR");
+//     } else {
+//         alert("マイコンと接続されていません！");
+//     }
+// });
