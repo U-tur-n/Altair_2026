@@ -10,9 +10,17 @@
 
 unsigned long lastTime = 0;
 
+float altitude = BME::altitude;
+float latitude = GPS::latitude;
+float longitude = GPS::longitude;
+float ax;
+float ay;
+float az;
+float q;
+
 std::vector<float> measureData;
 File fp;
-char fileName[] = "/data.csv";
+char fileName[] = "/data0.csv";
 
 // put function declarations here:
 void save(bool);
@@ -32,6 +40,8 @@ void setup() {
     while (1)
       ;
     }
+    
+  Serial.println("OK");
 
   BME::begin();
   BNO::begin();
@@ -67,13 +77,13 @@ void loop() {
     BME::execute();
     GPS::execute();
     BNO::execute();
-    float altitude = BME::altitude;
-    float latitude = GPS::latitude;
-    float longitude = GPS::longitude;
-    float ax = BNO::ax;
-    float ay = BNO::ay;
-    float az = BNO::az;
-    float q = BNO::q;
+    altitude = BME::altitude;
+    latitude = GPS::latitude;
+    longitude = GPS::longitude;
+    ax = BNO::ax;
+    ay = BNO::ay;
+    az = BNO::az;
+    // q = BNO::q;
 
     measureData.push_back(altitude);
     measureData.push_back(latitude);
@@ -81,7 +91,7 @@ void loop() {
     measureData.push_back(ax);
     measureData.push_back(ay); 
     measureData.push_back(az);
-    measureData.push_back(q);
+    // measureData.push_back(q);
 
     Serial.print(altitude);
     Serial.print(", ");
@@ -94,8 +104,8 @@ void loop() {
     Serial.print(ay);
     Serial.print(", ");
     Serial.print(az);
-    Serial.print(", ");
-    Serial.println(q);
+    // Serial.print(", ");
+    // Serial.println(q);
     if(measureData.size() >= 2100 || digitalRead(tact) == LOW){
       save(false);
     }
@@ -115,9 +125,9 @@ void save(bool end) {
     fp.print(",");
     fp.print(data); // ay
     fp.print(",");
-    fp.print(data); // az
-    fp.print(",");
-    fp.println(data); // q
+    fp.println(data); // az
+    // fp.print(",");
+    // fp.println(data); // q
     // Serial.println("receive any key...");
     // if (Serial.available() != 0){
     //   while(1)
