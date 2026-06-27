@@ -13,7 +13,7 @@
 
 
 // 同一SPIバス上のMicroSDスロットのCSピン（衝突防止用）
-#define SD_CS 4 //D3
+#define SD_CS 21
 
 namespace BME{
 // ソフトウェアSPIでBME280のインスタンスを生成
@@ -54,16 +54,18 @@ delay(1000); // シリアルモニタが開くまで待機
   Serial.print(launchPressure);
   Serial.println(" hPa (この地点を高度 0m とします)");
   Serial.println("---------------------------------------");
+
+  digitalWrite(cs, HIGH); // BME280のCSピンをHIGHにしてSPIバスを解放
 }
 
 void execute() {
   // --- 仕様書で定義された変数名 ---
   
-
+  digitalWrite(cs, LOW); // BME280のCSピンをLOWにして通信開始
   // float pressure = bme.readPressure() / 100.0F;     // 気圧 [hPa]
   altitude = bme.readAltitude(launchPressure); // 高度 [m] (打ち上げ地点を0mとして算出)
   float temperature = bme.readTemperature();         // 温度 [°C] (気圧センサ内蔵)
-
+  digitalWrite(cs, HIGH); // BME280のCSピンをHIGHにして通信終了
 }
 
 }

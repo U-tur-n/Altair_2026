@@ -6,7 +6,7 @@
 #include "GPS/GPS.h"
 
 #define tact 1 // D0
-#define cs_SD 21
+#define SD_CS 21
 
 unsigned long lastTime = 0;
 
@@ -28,14 +28,14 @@ void save(bool);
 void setup() {
   // put your setup code here, to run once:
   //ピン設定
-  pinMode(cs_SD, OUTPUT);
+  pinMode(SD_CS, OUTPUT);
   pinMode(tact, INPUT_PULLUP);
 
   
   Serial.begin(115200);
   //SD初期化
   Serial.print("Initializing SD card...");
-    if (SD.begin(cs_SD) == false) {
+    if (SD.begin(SD_CS) == false) {
     Serial.println("SD card faile ro not present");
     while (1)
       ;
@@ -52,6 +52,7 @@ void setup() {
   Serial.begin(115200);
 
   //タクトスイッチが押されたら計測開始
+  digitalWrite(SD_CS, LOW);
   Serial.print("Opening the file...");
   fp = SD.open(fileName, FILE_WRITE);
   if (fp == false) {
@@ -59,6 +60,7 @@ void setup() {
     while (1)
       ;
   }
+  digitalWrite(SD_CS, HIGH);
   
   Serial.println("receive any key...");
   while (Serial.available() == 0)
@@ -114,6 +116,7 @@ void loop() {
 
 // put function definitions here:
 void save(bool end) {
+  digitalWrite(SD_CS, LOW);
   for (double data : measureData) {
     fp.print(data); // altitude
     fp.print(",");
@@ -138,6 +141,7 @@ void save(bool end) {
     fp.flush();
     Serial.println("saved data");
     measureData.clear();
+    digitalWrite(SD_CS, HIGH);
   } else {
     fp.close();
     Serial.println("saved data and closed file");
