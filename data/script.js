@@ -44,3 +44,14 @@ function initWebSocket() {
 }
 
 window.addEventListener("load", initWebSocket, false);
+
+// 「SD記録 開始」ボタンのクリックイベント
+document.querySelector('.btn-sd').addEventListener('click', function() {
+    // WebSocketが接続されているか確認
+    if (websocket && websocket.readyState === WebSocket.OPEN) {
+        websocket.send("CMD_SD"); // ESP32にコマンドを送信
+        console.log("Sent: CMD_SD");
+    } else {
+        alert("マイコンと接続されていません！");
+    }
+});
