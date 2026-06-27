@@ -2,6 +2,8 @@
 #include <SD.h>
 #include <vector>
 #include "BME/BME.h"
+#include "BNO/BNO.h"
+#include "GPS/GPS.h"
 
 #define tact D0
 #define cs_SD 21
@@ -32,6 +34,8 @@ void setup() {
     }
 
   BME::begin();
+  BNO::begin();
+  GPS::begin();
 
   //ボーレートを115200
   Serial.end();
