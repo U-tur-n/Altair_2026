@@ -22,6 +22,9 @@ float ay;
 float az;
 float q;
 
+bool isRemoteSdActive = false; //記録開始用フラグ
+// bool isRemotePwrActive = false;//電装動作用フラグ
+
 std::vector<float> measureData;
 File fp;
 char fileName[] = "/data0.csv";
@@ -49,7 +52,7 @@ AwsFrameInfo *info = (AwsFrameInfo*)arg;
     Serial.println(message);
 
     // --- メッセージの内容に応じて変数を変更 ---
-    if (message == "CMD_SD") {
+    if (message == "CMD_SD" || isRemoteSdActive==true) {
       isRemoteSdActive = !isRemoteSdActive; // true/falseを反転
       Serial.print("SD記録フラグが変更されました: ");
       Serial.println(isRemoteSdActive ? "ON" : "OFF");
@@ -226,7 +229,7 @@ void loop() {
     // 接続されているすべてのブラウザへデータを送信
     ws.textAll(jsonString);
 
-    if(digitalRead(tact) == LOW){
+    if(digitalRead(tact) == LOW || isRemoteSdActive == true){
       save(true);
     }
     if(measureData.size() >= 2100){
