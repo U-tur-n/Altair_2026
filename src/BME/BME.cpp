@@ -17,7 +17,8 @@
 
 namespace BME{
 // ソフトウェアSPIでBME280のインスタンスを生成
-Adafruit_BME280 bme(cs, BME_MOSI, BME_MISO, BME_SCLK);
+// Adafruit_BME280 bme(cs, BME_MOSI, BME_MISO, BME_SCLK);  //SPI
+Adafruit_BME280 bme;  //I2C
 
 // 打ち上げ地点の基準気圧（0m補正用変数）
 float launchPressure = 1013.25; 
@@ -36,7 +37,7 @@ delay(1000); // シリアルモニタが開くまで待機
   Serial.println("--- BME280 計測システム初期化 ---");
 
   // BME280の初期化チェック
-  if (!bme.begin()) {
+  if (!bme.begin(0x76)) {
     Serial.println("エラー: BME280 センサが見つかりません。配線を確認してください。");
     while (1);
   }
