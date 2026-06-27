@@ -1,5 +1,7 @@
 //ヘッダーファイルをインクルード
+#include <Arduino.h>
 #include "GPS.h"
+#include <TinyGPS++.h>
 
 // ライブラリのインクルードは行わない(ヘッダーファイルですでに行っているため)
 
@@ -26,7 +28,8 @@ void begin() {  //setup()の代わり
 
   Serial.println("Goodnight moon!");
 
-  // set the data rate for the SoftwareSerial port
+
+  // set the data rate for the SoftwareSerial port!git s
   Serial1.begin(9600, SERIAL_8N1, RX1_PIN, TX1_PIN);
   Serial1.println("Hello, world?");
 }
@@ -37,11 +40,13 @@ void execute() {  // run over and over
     //Serial.print(c);
     gps.encode(c);
     if (gps.location.isUpdated()) {
-      Serial.print(millis());
-      Serial.print(", ");
-      Serial.print(gps.location.lat(), 6);
-      Serial.print(", ");
-      Serial.println(gps.location.lng(), 6);
+      latitude = gps.location.lat();
+      longitude = gps.location.lng();
+      // Serial.print(millis());
+      // Serial.print(", ");
+      // Serial.print(gps.location.lat(), 6);
+      // Serial.print(", ");
+      // Serial.println(gps.location.lng(), 6);
     }
   }
 }
