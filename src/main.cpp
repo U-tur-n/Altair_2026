@@ -97,13 +97,13 @@ void loop() {
     Serial.print(", ");
     Serial.println(q);
     if(measureData.size() >= 2100 || digitalRead(tact) == LOW){
-      save();
+      save(false);
     }
   }
 }
 
 // put function definitions here:
-void save() {
+void save(bool end) {
   for (double data : measureData) {
     fp.print(data); // altitude
     fp.print(",");
@@ -124,6 +124,15 @@ void save() {
     //     ;
     // }
   }
+  if (end == false) {
     fp.flush();
     Serial.println("saved data");
+    measureData.clear();
+  } else {
+    fp.close();
+    Serial.println("saved data and closed file");
+    measureData.clear();
+    while (1)
+      ;
+  }
 }
