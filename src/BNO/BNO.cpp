@@ -19,6 +19,7 @@ void begin(){
     Serial.println("no BNO055 detected");
     while (1);
   }
+  Serial.println("BNO055 OK");
   bno.setExtCrystalUse(true);
 }
 
