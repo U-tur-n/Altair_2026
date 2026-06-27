@@ -6,6 +6,12 @@ namespace BNO {
 
 Adafruit_BNO055 bno = Adafruit_BNO055(-1, 0x28, &Wire);
 
+float ax;
+float ay;
+float az;
+float q;
+
+
 void begin(){
   Serial.begin(115200);
 
@@ -19,9 +25,9 @@ void begin(){
 void execute(){
    imu::Vector<3> a = bno.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
 
-  float ax = a.x();
-  float ay = a.y();
-  float az = a.z();
+  ax = a.x();
+  ay = a.y();
+  az = a.z();
 
   // Serial.print("Accel: ");
   // Serial.print(ax); Serial.print(", ");
@@ -30,5 +36,6 @@ void execute(){
 
   // クォータニオン 
   imu::Quaternion q = bno.getQuat();
+  
 }
 }
