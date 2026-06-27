@@ -34,6 +34,34 @@ const char* ssid = "Altair_Avionics";     // 飛ばすWi-Fiの名前
 
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   // ブラウザからのボタン入力（SD記録開始など）を処理する場合はここに記述
+AwsFrameInfo *info = (AwsFrameInfo*)arg;
+  
+  // テキストメッセージがすべて揃っているか確認
+  if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
+    
+    // 受信したデータ(uint8_tの配列)を、扱いやすいString型に変換する
+    String message = "";
+    for (size_t i = 0; i < len; i++) {
+      message += (char)data[i];
+    }
+    
+    Serial.print("Web UIからコマンドを受信: ");
+    Serial.println(message);
+
+    // --- メッセージの内容に応じて変数を変更 ---
+    if (message == "CMD_SD") {
+      isRemoteSdActive = !isRemoteSdActive; // true/falseを反転
+      Serial.print("SD記録フラグが変更されました: ");
+      Serial.println(isRemoteSdActive ? "ON" : "OFF");
+      
+      // ここにSD記録開始の処理や save() 関数を呼び出す処理を書くことができます
+    } 
+    // else if (message == "CMD_PWR") {
+    //   isRemotePwrActive = !isRemotePwrActive;
+    //   Serial.print("電装動作フラグが変更されました: ");
+    //   Serial.println(isRemotePwrActive ? "ON" : "OFF");
+    // }
+  }
 }
 
 void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type,
