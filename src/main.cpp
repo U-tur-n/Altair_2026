@@ -1,5 +1,8 @@
 #include <Arduino.h>
 #include <SD.h>
+#include <WiFi.h>
+#include <ESPAsyncWebServer.h>
+#include <LittleFS.h>
 #include <vector>
 #include "BME/BME.h"
 #include "BNO/BNO.h"
@@ -23,6 +26,39 @@ std::vector<float> measureData;
 File fp;
 char fileName[] = "/data0.csv";
 
+AsyncWebServer server(80);
+AsyncWebSocket ws("/ws");
+
+// ネットワーク設定（お好みの名前に変更してください）
+const char* ssid = "Altair_Avionics";     // 飛ばすWi-Fiの名前
+
+void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
+  // ブラウザからのボタン入力（SD記録開始など）を処理する場合はここに記述
+}
+
+void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type,
+             void *arg, uint8_t *data, size_t len) {
+  switch (type) {
+    case WS_EVT_CONNECT:
+      Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
+      break;
+    case WS_EVT_DISCONNECT:
+      Serial.printf("WebSocket client #%u disconnected\n", client->id());
+      break;
+    case WS_EVT_DATA:
+      handleWebSocketMessage(arg, data, len);
+      break;
+    case WS_EVT_PONG:
+    case WS_EVT_ERROR:
+      break;
+  }
+}
+
+void initWebSocket() {
+  ws.onEvent(onEvent);
+  server.addHandler(&ws);
+}
+
 // put function declarations here:
 void save(bool);
 
@@ -45,8 +81,28 @@ SPI.begin();
   while(!Serial);
   delay(100);
 
-  //SD初期化
-  
+  initWebSocket();
+
+  // --- ここから APモード（アクセスポイント）の設定 ---
+    Serial.println("Starting Access Point...");
+    WiFi.softAP(ssid);
+    
+    // ESP32のIPアドレスを取得（デフォルトは 192.168.4.1 になります）
+    IPAddress IP = WiFi.softAPIP();
+    Serial.print("AP IP address: ");
+    Serial.println(IP);
+    // --------------------------------------------------
+
+    // --- 2. LittleFSの初期化（HTML等の読み込みに必須） ---
+  if(!LittleFS.begin(true)){
+    Serial.println("LittleFS Mount Failed");
+    while(1);
+  }
+    server.addHandler(&ws);
+    server.serveStatic("/", LittleFS, "/").setDefaultFile("index.html");
+    server.begin();
+
+  //SD初期化 
   Serial.print("Initializing SD card...");
     if (SD.begin(SD_CS) == false) {
     Serial.println("SD card faile ro not present");
@@ -55,7 +111,6 @@ SPI.begin();
     }
     
   Serial.println("OK");
-
 
   
   // Serial.println("receive any key...");
@@ -89,7 +144,8 @@ SPI.begin();
 
 void loop() {
   // put your main code here, to run repeatedly:
-  if(millis() - lastTime >= 100){
+  ws.cleanupClients();
+  if(millis() - lastTime >= 200){
     measureData.push_back(millis());
     Serial.print(millis());
     Serial.print(", ");
@@ -126,6 +182,22 @@ void loop() {
     Serial.println(az);
     // Serial.print(", ");
     // Serial.println(q);
+
+    // すでに取得済みの変数を元に、JSONフォーマットの文字列を生成
+    // (ArduinoJsonライブラリを使用しても良いですが、軽量化のため文字列結合で生成しています)
+    String jsonString = "{";
+    jsonString += "\"ax\":" + String(ax, 2) + ",";
+    jsonString += "\"ay\":" + String(ay, 2) + ",";
+    jsonString += "\"az\":" + String(az, 2) + ",";
+    jsonString += "\"latitude\":" + String(latitude, 6) + ",";
+    jsonString += "\"longitude\":" + String(longitude, 6) + ",";
+    jsonString += "\"altitude\":" + String(altitude, 1);
+    // jsonString += "\"msg\":\"Data updated at " + String(currentMillis / 1000) + "s\"";
+    jsonString += "}";
+
+    // 接続されているすべてのブラウザへデータを送信
+    ws.textAll(jsonString);
+
     if(digitalRead(tact) == LOW){
       save(true);
     }
