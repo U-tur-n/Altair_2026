@@ -6,7 +6,7 @@
 
 namespace GPS{
     extern float latitude;
-    extern float longtitude;
+    extern float longitude;
     void begin();
     void execute();
 }
