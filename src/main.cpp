@@ -105,15 +105,25 @@ void loop() {
 // put function definitions here:
 void save() {
   for (double data : measureData) {
-    fp.print(data);
+    fp.print(data); // altitude
     fp.print(",");
-    fp.println(data);
-    fp.close();
-    Serial.println("saved data");
+    fp.print(data); // latitude
+    fp.print(",");
+    fp.print(data); // longitude
+    fp.print(",");
+    fp.print(data); // ax
+    fp.print(",");
+    fp.print(data); // ay
+    fp.print(",");
+    fp.print(data); // az
+    fp.print(",");
+    fp.println(data); // q
     // Serial.println("receive any key...");
-    if (Serial.available() != 0){
-      while(1)
-        ;
-    }
+    // if (Serial.available() != 0){
+    //   while(1)
+    //     ;
+    // }
   }
+    fp.flush();
+    Serial.println("saved data");
 }
