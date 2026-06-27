@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI Reproduction with WebSocket</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="dashboard">
+        <div class="col-left">
+            <div class="section-label">加速度 [m/s&sup2;]</div>
+            <div class="data-panel">
+                <div>x : <span id="ax">-</span></div>
+                <div>y : <span id="ay">-</span></div>
+                <div>z : <span id="az">-</span></div>
+            </div>
+
+            <div class="section-label">オイラー角 (ZYX) [deg]</div>
+            <div class="data-panel">
+                <div>x : <span id="ox">-</span></div>
+                <div>y : <span id="oy">-</span></div>
+                <div>z : <span id="oz">-</span></div>
+            </div>
+
+            <div class="section-label">
+                <span style="margin-right: 15px;">緯度・経度 [deg]</span> 高度 [m]
+            </div>
+            <div class="data-panel">
+                <div>緯 : <span id="lat">-</span></div>
+                <div>経 : <span id="lng">-</span></div>
+                <div>高 : <span id="alt">-</span></div>
+            </div>
+
+            <div class="video-feed"></div>
+        </div>
+
+        <div class="col-right">
+            <div class="button-area">
+                <button class="btn btn-sd">SD記録<br>開始</button>
+                <button class="btn btn-pwr">電装動作</button>
+            </div>
+
+            <div class="status-area">
+                <div class="status-label">接続状態 : <span id="ws-status" style="color: red;">切断</span></div>
+                <div class="status-label" style="margin-top: 15px;">ステータスメッセージ</div>
+                <div class="status-box" id="status-msg" style="padding: 10px; font-family: monospace; box-sizing: border-box;"></div>
+                <div class="footer-text">Altair Remote Monitoring & Control System Ver. 1.0.0</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
