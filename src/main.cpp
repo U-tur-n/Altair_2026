@@ -81,6 +81,7 @@ SPI.begin();
       ;
   }
   Serial.println("OK");
+  fp.println("time, altitude, latitude, longitude, ax, ay, az, q");
   Serial.println("press the tact switch...");
   while(digitalRead(tact) == HIGH)
     ;
@@ -137,34 +138,32 @@ void loop() {
 
 // put function definitions here:
 void save(bool end) {
+  int i = 0;
   digitalWrite(SD_CS, LOW);
-  for (double data : measureData) {
-    fp.print(data); // altitude
-    fp.print(",");
-    fp.print(data); // latitude
-    fp.print(",");
-    fp.print(data); // longitude
-    fp.print(",");
-    fp.print(data); // ax
-    fp.print(",");
-    fp.print(data); // ay
-    fp.print(",");
-    fp.println(data); // az
-    // fp.print(",");
-    // fp.println(data); // q
-    // Serial.println("receive any key...");
-    // if (Serial.available() != 0){
-    //   while(1)
-    //     ;
-    // }
-  }
-  if (end == false) {
+    for (double data : measureData)
+    {
+      fp.print(data);
+      i++;
+      if (i % 7 == 0) { // 7個のデータごとに改行
+        fp.println();
+      } else {
+        fp.print(",");
+      }
+      // fp.print(",");
+      // fp.println(data); // q
+      // Serial.println("receive any key...");
+      // if (Serial.available() != 0){
+      //   while(1)
+      //     ;
+      // }
+    }
+  if (end == false) { // データ保存のみ
     fp.flush();
     Serial.println("saved data");
     measureData.clear();
     digitalWrite(SD_CS, HIGH);
   } else {
-    fp.close();
+    fp.close(); // ファイルを閉じる(スイッチが押された場合)
     Serial.println("saved data and closed file");
     measureData.clear();
     while (1)
