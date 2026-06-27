@@ -7,6 +7,7 @@
 
 #define tact 1 // D0
 #define SD_CS 21
+#define BME_CS 3
 
 unsigned long lastTime = 0;
 
@@ -29,11 +30,23 @@ void setup() {
   // put your setup code here, to run once:
   //ピン設定
   pinMode(SD_CS, OUTPUT);
+  pinMode(BME_CS, OUTPUT);
   pinMode(tact, INPUT_PULLUP);
 
   
+SPI.begin();
+  //SPI衝突回避用
+  digitalWrite(SD_CS, HIGH);
+  digitalWrite(BME_CS, HIGH);
+
+  
+
   Serial.begin(115200);
+  while(!Serial);
+  delay(100);
+
   //SD初期化
+  
   Serial.print("Initializing SD card...");
     if (SD.begin(SD_CS) == false) {
     Serial.println("SD card faile ro not present");
@@ -43,6 +56,14 @@ void setup() {
     
   Serial.println("OK");
 
+
+  
+  // Serial.println("receive any key...");
+  // while (Serial.available() == 0)
+  //   ;
+  //   ;
+  
+
   BME::begin();
   BNO::begin();
   GPS::begin();
@@ -51,8 +72,7 @@ void setup() {
   Serial.end();
   Serial.begin(115200);
 
-  //タクトスイッチが押されたら計測開始
-  digitalWrite(SD_CS, LOW);
+    //タクトスイッチが押されたら計測開始
   Serial.print("Opening the file...");
   fp = SD.open(fileName, FILE_WRITE);
   if (fp == false) {
@@ -60,13 +80,6 @@ void setup() {
     while (1)
       ;
   }
-  digitalWrite(SD_CS, HIGH);
-  
-  Serial.println("receive any key...");
-  while (Serial.available() == 0)
-    ;
-    ;
-  
 }
 
 void loop() {
