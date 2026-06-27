@@ -40,6 +40,8 @@ void execute() {  // run over and over
     //Serial.print(c);
     gps.encode(c);
     if (gps.location.isUpdated()) {
+      latitude = gps.location.lat();
+      longitude = gps.location.lng();
       // Serial.print(millis());
       // Serial.print(", ");
       // Serial.print(gps.location.lat(), 6);
