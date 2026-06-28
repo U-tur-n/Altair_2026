@@ -169,8 +169,10 @@ SPI.begin();
   Serial.println("OK");
   fp.println("time, altitude, latitude, longitude, ax, ay, az, q");
   Serial.println("press the tact switch...");
-  while(digitalRead(tact) == HIGH)
-    ;
+  while(digitalRead(tact) == HIGH && isRemoteSdActive == false) {
+    delay(10);
+  }
+    
 }
 
 void loop() {
