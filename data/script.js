@@ -3,15 +3,6 @@ const targetIp = window.location.hostname
   : "192.168.4.1";
 const wsUri = `ws://${targetIp}/ws`;
 
-// カメラに関する設定
-const targetIp = window.location.hostname
-  ? window.location.hostname
-  : "192.168.4.1";
-const wsUri = `ws://${targetIp}/ws`;
-
-// --- ここを追加 ---
-document.getElementById("camera-stream").src = `http://${targetIp}:81/stream`;
-
 let websocket;
 
 function initWebSocket() {
