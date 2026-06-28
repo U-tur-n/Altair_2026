@@ -172,7 +172,7 @@ SPI.begin();
   while(digitalRead(tact) == HIGH && isRemoteSdActive == false) {
     delay(10);
   }
-    
+  delay(10);
 }
 
 void loop() {
@@ -231,7 +231,7 @@ void loop() {
     // 接続されているすべてのブラウザへデータを送信
     ws.textAll(jsonString);
 
-    if(digitalRead(tact) == LOW || isRemoteSdActive == true){
+    if(digitalRead(tact) == LOW || isRemoteSdActive == false){
       save(true);
     }
     if(measureData.size() >= 2100){
