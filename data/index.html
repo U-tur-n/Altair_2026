@@ -4,51 +4,78 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UI Reproduction with WebSocket</title>
-    <!-- 既存のCSSファイルはそのまま読み込みます -->
     <link rel="stylesheet" href="style.css">
     
-    <!-- 追加: 既存のCSSを上書きし、レスポンシブ対応と視認性向上を行うスタイル -->
     <style>
-        /* ベースレイアウトの柔軟化 */
+        /* ベースレイアウトの柔軟化と背景色の変更 */
         body {
-            background-color: #f0f2f5;
+            background-color: #000000; /* 背景を黒に変更 */
             padding: 15px; 
         }
         
         .dashboard {
             width: 100% !important; /* style.cssの1000px固定を上書き */
             max-width: 1100px;
-            background-color: #ffffff;
+            background-color: #01061f; /* ダッシュボードの背景を濃い紺色に変更 */
             border-radius: 12px;
             border: none;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6); /* 背景に合わせて影を調整 */
             position: relative; /* ロゴ画像を絶対配置するための基準線 */
+            color: #ffffff; /* 基本の文字色を白に設定 */
         }
 
-        /* ロゴ画像の配置とサイズ調整 (前回の2倍に拡大) */
+        /* ロゴ画像の配置とサイズ調整 */
         .site-logo {
             position: absolute;
             top: 15px;
             right: 20px;
-            height: 70px; /* 35pxの2倍に変更 */
+            height: 70px; 
             width: auto;
             object-fit: contain;
             z-index: 10; /* 他の要素より手前に表示 */
         }
 
-        /* センサー値パネルの視認性向上 */
-        .data-panel {
-            background-color: #f8f9fa;
-            border: 1px solid #ced4da;
-            border-radius: 6px;
+        /* ダーク背景に合わせてセクション名やステータスラベルの文字色を白に変更 */
+        .section-label, .status-label {
+            color: #ffffff;
         }
 
-        /* 追加: 操作ボタンの位置を下げる (既存の25pxから上書きして増やす) */
+        /* センサー値パネル（テキストボックス）を背景色に馴染む配色に変更 */
+        .data-panel {
+            background-color: #0b143c; /* テキストボックスの背景を少し明るめの紺に変更 */
+            border: 1px solid #20337a; /* 枠線をサイバー感のある青に変更 */
+            border-radius: 6px;
+            color: #ffffff; /* 表示文字の色を白に変更 */
+        }
+
+        /* 表示文字のフォント色を確実に白にするための指定 */
+        .data-panel > div {
+            color: #ffffff;
+        }
+
+        /* 操作ボタンの位置 (margin-topで調整) */
         .button-area {
             margin-top: 80px; 
         }
 
-        /* ログウィンドウをターミナル風にして野外でも見やすくする */
+        /* ボタンの立体感と押し込みアクション (色は維持) */
+        .btn {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-pwr {
+            background-color: #dc3545; /* 視認性の高い赤を維持 */
+        }
+
+        /* ログウィンドウ (指定通り背景色・文字色は変更せず維持) */
         .status-box {
             background-color: #1e1e1e;
             color: #32cd32; /* 明るい緑 */
@@ -56,24 +83,7 @@
             border-radius: 6px;
             padding: 12px !important;
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
-            box-sizing: border-box;
-        }
-
-        /* ボタンの立体感と押し込みアクション */
-        .btn {
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
-            transition: transform 0.1s, box-shadow 0.1s;
-        }
-        
-        .btn:active {
-            transform: translateY(2px);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-        }
-
-        .btn-pwr {
-            background-color: #dc3545; /* 視認性の高い赤 */
+            box-sizing: border-box; /* 右側へのはみ出しを防止 */
         }
 
         /* レスポンシブ対応 (タブレット・スマホ向け) */
@@ -85,7 +95,7 @@
                 right: 0;
                 display: block;
                 margin: 0 auto 15px auto;
-                height: 70px; /* スマホ画面でも2倍サイズを適用 */
+                height: 70px; 
             }
 
             .dashboard {
@@ -102,7 +112,7 @@
                 flex-direction: row; /* スマホではボタンを横に並べて省スペース化 */
                 justify-content: space-between;
                 gap: 15px;
-                margin-top: 30px; /* スマホ表示でも元の位置より少し下げる */
+                margin-top: 30px; /* スマホ表示用ボタン上の余白 */
                 margin-bottom: 20px;
             }
 
@@ -122,8 +132,7 @@
 </head>
 <body>
     <div class="dashboard">
-        <!-- 同じ階層のロゴ画像を表示 -->
-        <img src="Altir_logo.png" alt="Altair Logo" class="site-logo">
+        <img src="mark_logo_cmyk.png" alt="Altair Logo" class="site-logo">
 
         <div class="col-left">
             <div class="section-label">加速度 [m/s&sup2;]</div>
@@ -165,12 +174,11 @@
                 <div class="status-label">接続状態 : <span id="ws-status" style="color: red;">切断</span></div>
                 <div class="status-label" style="margin-top: 15px;">ステータスメッセージ</div>
                 <div class="status-box" id="status-msg"></div>
-                <div class="footer-text" style="color: #6c757d; font-size: 14px; margin-top: 10px;">Altair Remote Monitoring & Control System Ver. 1.2.2</div>
+                <div class="footer-text" style="color: #8f9bb3; font-size: 14px; margin-top: 10px;">Altair Remote Monitoring & Control System Ver. 1.2.2</div>
             </div>
         </div>
     </div>
 
-    <!-- 既存のJSファイルはそのまま読み込みます -->
     <script src="script.js"></script>
 </body>
 </html>
