@@ -27,7 +27,7 @@ float lastTime = 0.0;
 float altitude;
 
 void begin() {
-  Serial.begin(115200);
+  // Serial.begin(115200);
 delay(1000); // シリアルモニタが開くまで待機
 
   // MicroSD側のCSピンをHIGHにして、SPIバスでの信号衝突を防ぐ

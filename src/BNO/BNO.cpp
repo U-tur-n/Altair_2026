@@ -14,7 +14,7 @@ float q;
 
 
 void begin(){
-  Serial.begin(115200);
+  // Serial.begin(115200);
   Wire.begin();
   Wire.setClock(50000);   // 通信速度を50kHzに下げて安定させる
   Wire.setTimeOut(20000); // センサーの演算待ちによるタイムアウトを防ぐ

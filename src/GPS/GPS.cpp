@@ -21,10 +21,10 @@ TinyGPSPlus gps;
 
 void begin() {  //setup()の代わり
   // Open serial communications and wait for port to open:
-  Serial.begin(57600);
-  while (!Serial) {
-    ;  // wait for serial port to connect. Needed for native USB port only
-  }
+  // Serial.begin(57600);z
+  // while (!Serial) {
+  //   ;  // wait for serial port to connect. Needed for native USB port only
+  // }
 
   Serial.println("Goodnight moon!");
 

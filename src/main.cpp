@@ -166,11 +166,13 @@ SPI.begin();
   //   ;
   //   ;
   
-
+  delay(100);
   BME::begin();
+  delay(100);
   BNO::begin();
+  delay(100);
   GPS::begin();
-
+  delay(100);
   //ボーレートを115200
   Serial.end();
   Serial.begin(115200);
