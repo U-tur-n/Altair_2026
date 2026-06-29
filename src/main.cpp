@@ -250,7 +250,8 @@ void loop() {
     jsonString += "\"az\":" + String(az, 2) + ",";
     jsonString += "\"latitude\":" + String(latitude, 6) + ",";
     jsonString += "\"longitude\":" + String(longitude, 6) + ",";
-    jsonString += "\"altitude\":" + String(altitude, 1);
+    jsonString += "\"altitude\":" + String(altitude, 1) + ",";
+    jsonString += "\"sd_active\":" + String(isRemoteSdActive ? "true" : "false");
     // jsonString += "\"msg\":\"Data updated at " + String(currentMillis / 1000) + "s\"";
     jsonString += "}";
 
@@ -305,6 +306,14 @@ void save(bool end) {
     Serial.println("saved data and closed file");
     sendStatusMessage("saved data and closed file");
     measureData.clear();
+
+      String jsonString = "{";
+    jsonString += "\"sd_active\":" + String(isRemoteSdActive ? "true" : "false");
+    jsonString += "}";
+
+    // 接続されているすべてのブラウザへデータを送信
+    ws.textAll(jsonString);
+    
   Serial.println("press the tact switch to restart...");
   sendStatusMessage("press the button to restart...");
     while (digitalRead(tact) == HIGH && isRemoteSdActive == false) {

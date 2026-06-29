@@ -60,6 +60,18 @@ function initWebSocket() {
         document.getElementById("lng").innerText = data.longitude;
       if (data.altitude !== undefined)
         document.getElementById("alt").innerText = data.altitude;
+      if (data.sd_active !== undefined) {
+        if (data.sd_active !== isRemoteSdActive) {
+          isRemoteSdActive = data.sd_active;
+          if (isRemoteSdActive) {
+            btnSd.innerHTML = "SD記録<br>停止";
+            btnSd.style.backgroundColor = "#FFD700"; // 黄色
+          } else {
+            btnSd.innerHTML = "SD記録<br>開始";
+            btnSd.style.backgroundColor = "#a4c2f4"; // 青色
+          }
+        }
+      }
       if (data.msg !== undefined) {
         const statusBox = document.getElementById("status-msg");
         statusBox.innerText += data.msg + "\n"; // メッセージを改行付きで追記
@@ -85,17 +97,17 @@ document.querySelector('.btn-sd').addEventListener('click', function() {
       console.log("Sent: CMD_SD");
 
       // UIの状態を反転させる
-      if (!isRemoteSdActive) {
-        // 記録開始状態へ変更
-        btnSd.innerHTML = "SD記録<br>停止"; // <br>で改行を維持
-        btnSd.style.backgroundColor = "#FFD700"; // 指定の黄色
-        isRemoteSdActive = true;
-      } else {
-        // 記録停止（初期）状態へ戻す
-        btnSd.innerHTML = "SD記録<br>開始";
-        btnSd.style.backgroundColor = "#a4c2f4"; // 元の青色
-        isRemoteSdActive = false;
-      }
+      // if (!isRemoteSdActive) {
+      //   // 記録開始状態へ変更
+      //   btnSd.innerHTML = "SD記録<br>停止"; // <br>で改行を維持
+      //   btnSd.style.backgroundColor = "#FFD700"; // 指定の黄色
+      //   isRemoteSdActive = true;
+      // } else {
+      //   // 記録停止（初期）状態へ戻す
+      //   btnSd.innerHTML = "SD記録<br>開始";
+      //   btnSd.style.backgroundColor = "#a4c2f4"; // 元の青色
+      //   isRemoteSdActive = false;
+      // }
     } else {
         alert("マイコンと接続されていません！");
     }
