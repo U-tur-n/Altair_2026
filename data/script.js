@@ -5,7 +5,14 @@ const targetIp = window.location.hostname
 const wsUri = `ws://${targetIp}/ws`;
 
 // --- ここを追加 ---
-  document.getElementById("camera-stream").src = `http://${targetIp}:81/stream`;
+    document.getElementById("btn-camera").addEventListener("click", function() {
+    // ボタンが押されたら、画像のURLにESP32のストリームURLをセットする
+    document.getElementById("camera-stream").src = `http://${targetIp}:81/stream`;
+    
+    // 2回押されないようにボタンの表示を変えて無効化する
+    this.innerText = "カメラ取得中...";
+    this.disabled = true;
+});
 
 let websocket;
 
