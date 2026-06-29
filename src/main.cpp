@@ -26,6 +26,8 @@ float q;
 bool isRemoteSdActive = false; //記録開始用フラグ
 // bool isRemotePwrActive = false;//電装動作用フラグ
 
+bool last_camera_in_use = false;
+
 std::vector<float> measureData;
 File fp;
 char fileName[] = "/data0.csv";
@@ -218,6 +220,10 @@ SPI.begin();
   Serial.println("press the tact switch...");
   sendStatusMessage("press the button...");
   while(digitalRead(tact) == HIGH && isRemoteSdActive == false) {
+    if(camera_in_use != last_camera_in_use){
+      sendStatusMessage(camera_in_use ? "Camera is active" : "Camera is inactive");
+      last_camera_in_use = camera_in_use;
+    }
     delay(10);
   }
   delay(10);
@@ -285,6 +291,11 @@ void loop() {
     // 接続されているすべてのブラウザへデータを送信
     ws.textAll(jsonString);
 
+    if(camera_in_use != last_camera_in_use){
+      sendStatusMessage(camera_in_use ? "Camera is active" : "Camera is inactive");
+      last_camera_in_use = camera_in_use;
+    }
+
     if(digitalRead(tact) == LOW || isRemoteSdActive == false){
       Serial.println("stop");
       sendStatusMessage("stop");
@@ -345,6 +356,10 @@ void save(bool end) {
   Serial.println("press the tact switch to restart...");
   sendStatusMessage("press the button to restart...");
     while (digitalRead(tact) == HIGH && isRemoteSdActive == false) {
+      if(camera_in_use != last_camera_in_use){
+      sendStatusMessage(camera_in_use ? "Camera is active" : "Camera is inactive");
+      last_camera_in_use = camera_in_use;
+    }
       delay(10);
     }
     delay(10);
