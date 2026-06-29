@@ -5,6 +5,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UI Reproduction with WebSocket</title>
     <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* ベースレイアウトの柔軟化 */
+        body {
+            background-color: #f0f2f5;
+            padding: 15px; 
+        }
+        
+        .dashboard {
+            width: 100% !important; /* style.cssの1000px固定を上書き */
+            max-width: 1100px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
+        }
+
+        /* センサー値パネルの視認性向上 */
+        .data-panel {
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+        }
+
+        /* ログウィンドウをターミナル風にして野外でも見やすくする */
+        .status-box {
+            background-color: #1e1e1e;
+            color: #32cd32; /* 明るい緑 */
+            border: none;
+            border-radius: 6px;
+            padding: 12px !important;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* ボタンの立体感と押し込みアクション */
+        .btn {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-pwr {
+            background-color: #dc3545; /* 視認性の高い赤 */
+        }
+
+        /* レスポンシブ対応 (タブレット・スマホ向け) */
+        @media screen and (max-width: 768px) {
+            .dashboard {
+                flex-direction: column; /* 左右の列を縦並びに */
+                gap: 20px;
+                padding: 15px;
+            }
+
+            .data-panel > div {
+                font-size: 20px; /* スマホ向けにフォントサイズを微調整 */
+            }
+
+            .button-area {
+                flex-direction: row; /* スマホではボタンを横に並べて省スペース化 */
+                justify-content: space-between;
+                gap: 15px;
+                margin-top: 10px;
+                margin-bottom: 20px;
+            }
+
+            .btn {
+                width: 100%;
+                flex: 1;
+                font-size: 24px;
+                height: 80px;
+            }
+
+            .video-feed {
+                min-height: 250px;
+                border-radius: 6px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="dashboard">
@@ -32,7 +116,7 @@
                 <div>高 : <span id="alt">-</span></div>
             </div>
 
-            <button id="btn-camera" class="btn" style="width: 100%; height: 40px; font-size: 16px; margin-bottom: 5px; background-color: #A4C2F4; border: 2px solid #000; border-radius: 5px; cursor: pointer;">
+            <button id="btn-camera" class="btn" style="width: 100%; height: 45px; font-size: 16px; margin-bottom: 5px; background-color: #A4C2F4; border-radius: 8px; cursor: pointer;">
                 カメラ映像を取得 (1台のみ)
             </button>
             <img id="camera-stream" class="video-feed" alt="Camera Stream">
@@ -47,8 +131,8 @@
             <div class="status-area">
                 <div class="status-label">接続状態 : <span id="ws-status" style="color: red;">切断</span></div>
                 <div class="status-label" style="margin-top: 15px;">ステータスメッセージ</div>
-                <div class="status-box" id="status-msg" style="padding: 10px; font-family: monospace; box-sizing: border-box;"></div>
-                <div class="footer-text">Altair Remote Monitoring & Control System Ver. 1.2.2</div>
+                <div class="status-box" id="status-msg"></div>
+                <div class="footer-text" style="color: #6c757d; font-size: 14px; margin-top: 10px;">Altair Remote Monitoring & Control System Ver. 1.3.0</div>
             </div>
         </div>
     </div>
