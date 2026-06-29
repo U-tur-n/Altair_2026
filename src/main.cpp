@@ -174,8 +174,6 @@ SPI.begin();
   GPS::begin();
   delay(100);
   //ボーレートを115200
-  Serial.end();
-  Serial.begin(115200);
 
     //タクトスイッチが押されたら計測開始
   Serial.print("Opening the file...");
