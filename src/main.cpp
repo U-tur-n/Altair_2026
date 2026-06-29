@@ -58,7 +58,7 @@ AwsFrameInfo *info = (AwsFrameInfo*)arg;
     Serial.println(message);
 
     // --- メッセージの内容に応じて変数を変更 ---
-    if (message == "CMD_SD" || isRemoteSdActive==true) {
+    if (message == "CMD_SD" ) { //|| isRemoteSdActive==true
       isRemoteSdActive = !isRemoteSdActive; // true/falseを反転
       Serial.print("SD記録フラグが変更されました: ");
       Serial.println(isRemoteSdActive ? "ON" : "OFF");
@@ -189,6 +189,10 @@ SPI.begin();
     delay(10);
   }
   delay(10);
+  while(digitalRead(tact) == LOW)
+  ;
+  isRemoteSdActive = true; // リモートSD記録フラグを強制的にtrueに設定
+  sendStatusMessage("start");
 }
 
 void loop() {
@@ -248,6 +252,11 @@ void loop() {
     ws.textAll(jsonString);
 
     if(digitalRead(tact) == LOW || isRemoteSdActive == false){
+      Serial.println("stop");
+      sendStatusMessage("stop");
+      
+  while(digitalRead(tact) == LOW)
+  ;
       save(true);
     }
     if(measureData.size() >= 2100){
@@ -286,6 +295,7 @@ void save(bool end) {
     digitalWrite(SD_CS, HIGH);
   } else {
     fp.close(); // ファイルを閉じる(スイッチが押された場合)
+    isRemoteSdActive = false; // 記録フラグをfalseに戻す
     Serial.println("saved data and closed file");
     sendStatusMessage("saved data and closed file");
     measureData.clear();
@@ -295,5 +305,9 @@ void save(bool end) {
       delay(10);
     }
     delay(10);
-  }
+  while(digitalRead(tact) == LOW)
+  ;
+  isRemoteSdActive = true; // リモートSD記録フラグを強制的にtrueに設定
+  sendStatusMessage("start");
+}
 }
