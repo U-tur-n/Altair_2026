@@ -44,8 +44,11 @@ function initWebSocket() {
         document.getElementById("lng").innerText = data.longitude;
       if (data.altitude !== undefined)
         document.getElementById("alt").innerText = data.altitude;
-      if (data.msg !== undefined)
-        document.getElementById("status-msg").innerText = data.msg;
+      if (data.msg !== undefined) {
+        const statusBox = document.getElementById("status-msg");
+        statusBox.innerText += data.msg + "\n"; // メッセージを改行付きで追記
+        statusBox.scrollTop = statusBox.scrollHeight; // 最下部へ自動スクロール
+      }
     } catch (e) {
       console.error("JSON Error: ", e);
     }

@@ -132,6 +132,10 @@ background-color: #333; /* 読み込み前の背景色（黒寄り） */
     height: 130px;
     width: 100%;
     margin-bottom: 10px;
+    overflow-y: auto;       /* 縦スクロールを有効にする */
+    white-space: pre-wrap;  /* 改行コードを有効にし、枠端で自動折り返し */
+    word-break: break-all;  /* 長い英数字でも枠に合わせて強制折り返し */
+}
 }
 
 .footer-text {

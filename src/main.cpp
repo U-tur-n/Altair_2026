@@ -32,6 +32,12 @@ char fileName[] = "/data0.csv";
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 
+// Web UIのステータスボックスにメッセージを送る関数
+void sendStatusMessage(String msg) {
+  String jsonString = "{\"msg\":\"" + msg + "\"}";
+  ws.textAll(jsonString);
+}
+
 // ネットワーク設定（お好みの名前に変更してください）
 const char* ssid = "Altair_Avionics";     // 飛ばすWi-Fiの名前
 
@@ -64,6 +70,8 @@ AwsFrameInfo *info = (AwsFrameInfo*)arg;
     //   Serial.print("電装動作フラグが変更されました: ");
     //   Serial.println(isRemotePwrActive ? "ON" : "OFF");
     // }
+
+    
   }
 }
 
@@ -135,13 +143,16 @@ SPI.begin();
 
   //SD初期化 
   Serial.print("Initializing SD card...");
+  sendStatusMessage("Initializing SD card...");
     if (SD.begin(SD_CS) == false) {
-    Serial.println("SD card faile ro not present");
+    Serial.println("SD card or file not present");
+    sendStatusMessage("SD card or file not present");
     while (1)
       ;
     }
     
   Serial.println("OK");
+    sendStatusMessage("OK");
 
   
   // Serial.println("receive any key...");
@@ -160,15 +171,20 @@ SPI.begin();
 
     //タクトスイッチが押されたら計測開始
   Serial.print("Opening the file...");
+    sendStatusMessage("Opening the file...");
   fp = SD.open(fileName, FILE_WRITE);
   if (fp == false) {
     Serial.println("cannot open the file");
+    sendStatusMessage("cannot open the file");
     while (1)
       ;
   }
   Serial.println("OK");
+  sendStatusMessage("OK");
+
   fp.println("time, altitude, latitude, longitude, ax, ay, az, q");
   Serial.println("press the tact switch...");
+  sendStatusMessage("press the buttotn...");
   while(digitalRead(tact) == HIGH && isRemoteSdActive == false) {
     delay(10);
   }
@@ -265,11 +281,13 @@ void save(bool end) {
   if (end == false) { // データ保存のみ
     fp.flush();
     Serial.println("saved data");
+    sendStatusMessage("saved data");
     measureData.clear();
     digitalWrite(SD_CS, HIGH);
   } else {
     fp.close(); // ファイルを閉じる(スイッチが押された場合)
     Serial.println("saved data and closed file");
+    sendStatusMessage("saved data and closed file");
     measureData.clear();
     while (1)
       ;
