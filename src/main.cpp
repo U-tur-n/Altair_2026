@@ -7,6 +7,7 @@
 #include "BME/BME.h"
 #include "BNO/BNO.h"
 #include "GPS/GPS.h"
+#include "camera_server/camera_server.h"
 
 #define tact 1 // D0
 #define SD_CS 21
@@ -122,6 +123,7 @@ SPI.begin();
 
   initWebSocket();
 
+
   // --- ここから APモード（アクセスポイント）の設定 ---
     Serial.println("Starting Access Point...");
     WiFi.softAP(ssid);
@@ -140,6 +142,10 @@ SPI.begin();
     server.addHandler(&ws);
     server.serveStatic("/", LittleFS, "/").setDefaultFile("index.html");
     server.begin();
+
+  // --- 3. カメラの初期化とカメラサーバーの開始 ---
+  initCamera();
+  startCameraServer();
 
   //SD初期化 
   Serial.print("Initializing SD card...");
