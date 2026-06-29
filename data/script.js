@@ -73,12 +73,29 @@ function initWebSocket() {
 
 window.addEventListener("load", initWebSocket, false);
 
+
+// SD記録の状態を記憶する変数
+let isRemoteSdActive = false;
+const btnSd = document.querySelector('.btn-sd');
 // 「SD記録 開始」ボタンのクリックイベント
 document.querySelector('.btn-sd').addEventListener('click', function() {
     // WebSocketが接続されているか確認
     if (websocket && websocket.readyState === WebSocket.OPEN) {
-        websocket.send("CMD_SD"); // ESP32にコマンドを送信
-        console.log("Sent: CMD_SD");
+      websocket.send("CMD_SD"); // ESP32にコマンドを送信
+      console.log("Sent: CMD_SD");
+
+      // UIの状態を反転させる
+      if (!isRemoteSdActive) {
+        // 記録開始状態へ変更
+        btnSd.innerHTML = "SD記録<br>停止"; // <br>で改行を維持
+        btnSd.style.backgroundColor = "#FFD700"; // 指定の黄色
+        isRemoteSdActive = true;
+      } else {
+        // 記録停止（初期）状態へ戻す
+        btnSd.innerHTML = "SD記録<br>開始";
+        btnSd.style.backgroundColor = "#a4c2f4"; // 元の青色
+        isRemoteSdActive = false;
+      }
     } else {
         alert("マイコンと接続されていません！");
     }
