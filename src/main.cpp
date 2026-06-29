@@ -184,7 +184,7 @@ SPI.begin();
 
   fp.println("time, altitude, latitude, longitude, ax, ay, az, q");
   Serial.println("press the tact switch...");
-  sendStatusMessage("press the buttotn...");
+  sendStatusMessage("press the button...");
   while(digitalRead(tact) == HIGH && isRemoteSdActive == false) {
     delay(10);
   }
@@ -289,7 +289,11 @@ void save(bool end) {
     Serial.println("saved data and closed file");
     sendStatusMessage("saved data and closed file");
     measureData.clear();
-    while (1)
-      ;
+  Serial.println("press the tact switch to restart...");
+  sendStatusMessage("press the button to restart...");
+    while (digitalRead(tact) == HIGH && isRemoteSdActive == false) {
+      delay(10);
+    }
+    delay(10);
   }
 }
