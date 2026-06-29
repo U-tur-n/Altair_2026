@@ -4,14 +4,28 @@ const targetIp = window.location.hostname
   : "192.168.4.1";
 const wsUri = `ws://${targetIp}/ws`;
 
-// --- ここを追加 ---
-    document.getElementById("btn-camera").addEventListener("click", function() {
-    // ボタンが押されたら、画像のURLにESP32のストリームURLをセットする
-    document.getElementById("camera-stream").src = `http://${targetIp}:81/stream`;
-    
-    // 2回押されないようにボタンの表示を変えて無効化する
-    this.innerText = "カメラ取得中...";
-    this.disabled = true;
+let isCameraActive = false; // カメラの状態を記憶する変数
+const cameraBtn = document.getElementById("btn-camera");
+const cameraImg = document.getElementById("camera-stream");
+
+cameraBtn.addEventListener("click", function () {
+  if (!isCameraActive) {
+    // --- カメラを開始する処理 ---
+    cameraImg.src = `http://${targetIp}:81/stream`; // URLをセットして通信開始
+
+    // ボタンの見た目を「停止」用に変更
+    cameraBtn.innerText = "カメラ映像を停止";
+    cameraBtn.style.backgroundColor = "#ffb3b3"; // 警告色（薄い赤）にして分かりやすく
+    isCameraActive = true;
+  } else {
+    // --- カメラを停止する処理 ---
+    cameraImg.removeAttribute("src"); // src属性を削除して通信を強制切断
+
+    // ボタンの見た目を「開始」用に戻す
+    cameraBtn.innerText = "カメラ映像を取得 (1台のみ)";
+    cameraBtn.style.backgroundColor = "#A4C2F4"; // 元のグレーに戻す
+    isCameraActive = false;
+  }
 });
 
 let websocket;
