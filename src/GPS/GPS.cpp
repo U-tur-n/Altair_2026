@@ -20,11 +20,7 @@ TinyGPSPlus gps;
 // 自分だけが使う「内部変数」を定義(ヘッダーファイルでは宣言しない)
 
 void begin() {  //setup()の代わり
-  // Open serial communications and wait for port to open:
-  // Serial.begin(57600);z
-  // while (!Serial) {
-  //   ;  // wait for serial port to connect. Needed for native USB port only
-  // }
+
 
   Serial.println("Goodnight moon!");
 

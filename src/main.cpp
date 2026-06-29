@@ -118,7 +118,7 @@ SPI.begin();
   
 
   Serial.begin(115200);
-  while(!Serial);
+  // while(!Serial);
   delay(100);
 
   initWebSocket();
