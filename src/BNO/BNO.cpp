@@ -13,7 +13,7 @@ float az;
 float q;
 
 
-void begin(){
+bool BNObegin(){
   // Serial.begin(115200);
   Wire.begin();
   Wire.setClock(50000);   // 通信速度を50kHzに下げて安定させる
@@ -21,10 +21,11 @@ void begin(){
 
   if (!bno.begin()) {
     Serial.println("no BNO055 detected");
-    while (1);
+    return false;
   }
   Serial.println("BNO055 OK");
   bno.setExtCrystalUse(true);
+  return true;
 }
 
 void execute(){

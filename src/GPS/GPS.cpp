@@ -19,7 +19,7 @@ TinyGPSPlus gps;
 
 // 自分だけが使う「内部変数」を定義(ヘッダーファイルでは宣言しない)
 
-void begin() {  //setup()の代わり
+bool GPSbegin() {  //setup()の代わり
 
 
   Serial.println("Goodnight moon!");
@@ -28,6 +28,7 @@ void begin() {  //setup()の代わり
   // set the data rate for the SoftwareSerial port!git s
   Serial1.begin(9600, SERIAL_8N1, RX1_PIN, TX1_PIN);
   Serial1.println("Hello, world?");
+  return true;
 }
 
 void execute() {  // run over and over

@@ -147,6 +147,14 @@ SPI.begin();
   initCamera();
   startCameraServer();
 
+  //websocket接続まで待機
+  Serial.println("Waiting for Web UI to connect...");
+  while (ws.count() == 0) {
+    delay(100); // 接続されるまで100msごとに待機（WDTリセット防止のためdelayは必須）
+  }
+  Serial.println("Web UI Connected!");
+  delay(500); // 接続直後の安定化のために少し待つ
+
   //SD初期化 
   Serial.print("Initializing SD card...");
   sendStatusMessage("Initializing SD card...");
@@ -167,11 +175,29 @@ SPI.begin();
   //   ;
   
   delay(100);
-  BME::begin();
+  if(BME::BMEbegin()){
+    sendStatusMessage("BME280 initialized successfully.");
+  } else {
+    sendStatusMessage("BME280 initialization failed.");
+    while (1)
+      ;
+  }
   delay(100);
-  BNO::begin();
+  if(BNO::BNObegin()){
+    sendStatusMessage("BNO055 initialized successfully.");
+  } else {
+    sendStatusMessage("BNO055 initialization failed.");
+    while (1)
+      ;
+  }
   delay(100);
-  GPS::begin();
+  if(GPS::GPSbegin()){
+    sendStatusMessage("GPS initialized successfully.");
+  } else {
+    sendStatusMessage("GPS initialization failed.");
+    while (1)
+      ;
+  }
   delay(100);
   //ボーレートを115200
 

@@ -12,7 +12,7 @@ namespace BNO{
     extern float az;
     extern float q;
 
-  void begin();
+  bool BNObegin();
   void execute();
 
 }
