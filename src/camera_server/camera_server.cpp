@@ -23,6 +23,8 @@
 
 httpd_handle_t stream_httpd = NULL;
 
+bool camera_in_use = false;
+
 void initCamera() {
   camera_config_t config;
   config.ledc_channel = LEDC_CHANNEL_0;
@@ -65,6 +67,8 @@ static const char* _STREAM_BOUNDARY = "\r\n--" PART_BOUNDARY "\r\n";
 static const char* _STREAM_PART = "Content-Type: image/jpeg\r\nContent-Length: %u\r\n\r\n";
 
 esp_err_t stream_handler(httpd_req_t *req) {
+camera_in_use = true; // ← 【追加】配信ループに入ったら「使用中」にする
+
   camera_fb_t * fb = NULL;
   esp_err_t res = ESP_OK;
   size_t _jpg_buf_len = 0;
@@ -101,6 +105,7 @@ esp_err_t stream_handler(httpd_req_t *req) {
     }
     if (res != ESP_OK) break;
   }
+  camera_in_use = false; // ← 【追加】配信ループを抜けたら「使用中」を解除
   return res;
 }
 

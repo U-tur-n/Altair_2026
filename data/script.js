@@ -4,13 +4,23 @@ const targetIp = window.location.hostname
   : "192.168.4.1";
 const wsUri = `ws://${targetIp}/ws`;
 
-let isCameraActive = false; // カメラの状態を記憶する変数
+let isCameraActive = false; // 「自分の端末」でカメラを開いているか
+let globalCameraActive = false; // 「全体」で誰かがカメラを開いているか
 const cameraBtn = document.getElementById("btn-camera");
 const cameraImg = document.getElementById("camera-stream");
 
 cameraBtn.addEventListener("click", function () {
   if (!isCameraActive) {
     // --- カメラを開始する処理 ---
+
+    // ▼ 追加：既に誰かが使っていたらポップアップを出して処理を中断する ▼
+    if (globalCameraActive) {
+      alert(
+        "既に別の端末でカメラが接続済みです。\n映像を見るには、現在接続中の端末で停止してください。",
+      );
+      return;
+    }
+
     cameraImg.src = `http://${targetIp}:81/stream`; // URLをセットして通信開始
 
     // ボタンの見た目を「停止」用に変更
@@ -72,6 +82,9 @@ function initWebSocket() {
           }
         }
       }
+        if (data.cam_active !== undefined) {
+          globalCameraActive = data.cam_active;
+        }
       if (data.msg !== undefined) {
         const statusBox = document.getElementById("status-msg");
         statusBox.innerText += data.msg + "\n"; // メッセージを改行付きで追記
