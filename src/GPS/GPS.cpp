@@ -19,12 +19,8 @@ TinyGPSPlus gps;
 
 // 自分だけが使う「内部変数」を定義(ヘッダーファイルでは宣言しない)
 
-void begin() {  //setup()の代わり
-  // Open serial communications and wait for port to open:
-  Serial.begin(57600);
-  while (!Serial) {
-    ;  // wait for serial port to connect. Needed for native USB port only
-  }
+bool GPSbegin() {  //setup()の代わり
+
 
   Serial.println("Goodnight moon!");
 
@@ -32,6 +28,32 @@ void begin() {  //setup()の代わり
   // set the data rate for the SoftwareSerial port!git s
   Serial1.begin(9600, SERIAL_8N1, RX1_PIN, TX1_PIN);
   Serial1.println("Hello, world?");
+    while(!gps.location.isValid()) {
+    unsigned long lastTime = 0;
+    while (millis() - lastTime < 5000) {
+      while (Serial1.available() > 0) {
+        char c = Serial1.read();
+        //Serial.print(c);
+        gps.encode(c);
+        if (gps.location.isUpdated()) {
+          set_latitude = gps.location.lat();
+          set_longitude = gps.location.lng();
+          Serial.print("Set Latitude: ");
+          Serial.println(gps.location.lat(), 6);
+          Serial.print("Set Longitude: ");
+          Serial.println(gps.location.lng(), 6);
+        }
+        break;
+      }
+      if (millis() - lastTime >= 5000) {
+        Serial.println("Cannot get GPS location. Please check the GPS module.");
+        return false;
+      }
+    }
+
+  
+  }
+  return true;
 }
 
 void execute() {  // run over and over

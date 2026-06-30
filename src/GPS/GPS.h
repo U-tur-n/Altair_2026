@@ -7,6 +7,6 @@
 namespace GPS{
     extern float latitude;
     extern float longitude;
-    void begin();
+    bool GPSbegin();
     void execute();
 }
