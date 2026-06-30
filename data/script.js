@@ -105,11 +105,45 @@ window.addEventListener("load", function() {
   const isIOS = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   const isSafari = /Safari/i.test(ua) && !/Chrome/i.test(ua) && !/Edg/i.test(ua);
 
-  // ③ 該当するブラウザ(WebKit系)だった場合、カメラのUIを非表示にする
+// ③ 該当するブラウザ(WebKit系)だった場合、カメラのUIを非表示にし、メッセージを表示
   if (isIOS || isSafari) {
-    document.getElementById("btn-camera").style.display = "none";
-    document.getElementById("camera-stream").style.display = "none";
-    console.log("WebKit/iOS detected: Camera UI has been hidden.");
+    const btnCamera = document.getElementById("btn-camera");
+    const cameraStream = document.getElementById("camera-stream");
+
+    // 元のボタンとカメラ枠を非表示
+    btnCamera.style.display = "none";
+    cameraStream.style.display = "none";
+
+    // メッセージを表示する要素を動的に作成
+    const unsupportedMsg = document.createElement("div");
+    unsupportedMsg.className = "video-feed"; // 既存のカメラ枠のCSSクラスを流用（スマホでのサイズ可変にも対応）
+    unsupportedMsg.innerHTML =
+      "iOS, iPadOS, macOSでは<br>カメラの表示ができません";
+
+    // テキストを中央配置・装飾するための追加スタイル
+    unsupportedMsg.style.display = "flex";
+    unsupportedMsg.style.justifyContent = "center";
+    unsupportedMsg.style.alignItems = "center";
+    unsupportedMsg.style.color = "#ffb3b3"; // 警告の薄い赤色
+    unsupportedMsg.style.textAlign = "center";
+    unsupportedMsg.style.fontWeight = "bold";
+    unsupportedMsg.style.fontSize = "18px";
+    unsupportedMsg.style.border = "1px solid #dc3545"; // 赤枠をつけて目立たせる
+    unsupportedMsg.style.boxSizing = "border-box";
+    // 高さを強制的に変更・固定するための追加指定
+    unsupportedMsg.style.flexGrow = "0"; // 自動拡張を無効化
+    unsupportedMsg.style.minHeight = "95px"; // CSSの320pxを上書き
+    unsupportedMsg.style.height = "95px"; // 高さを95pxに固定
+
+    // カメラ領域（col-left）の、cameraStreamの直後にメッセージ要素を挿入
+    cameraStream.parentNode.insertBefore(
+      unsupportedMsg,
+      cameraStream.nextSibling,
+    );
+
+    console.log(
+      "WebKit/iOS detected: Camera UI replaced with unsupported message.",
+    );
   }
 
   // ④ 既存のWebSocket接続を開始
