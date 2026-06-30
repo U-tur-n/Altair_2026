@@ -142,7 +142,9 @@ SPI.begin();
     while(1);
   }
     server.addHandler(&ws);
-    server.serveStatic("/", LittleFS, "/").setDefaultFile("index.html");
+server.serveStatic("/", LittleFS, "/")
+      .setDefaultFile("index.html")
+      .setCacheControl("no-store, no-cache, must-revalidate, max-age=0"); //キャッシュを無効化するためのヘッダを追加
     server.begin();
 
   // --- 3. カメラの初期化とカメラサーバーの開始 ---
