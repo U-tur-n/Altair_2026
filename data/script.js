@@ -122,8 +122,14 @@ let isRemoteSdActive = false;
 const btnSd = document.querySelector('.btn-sd');
 // 「SD記録 開始」ボタンのクリックイベント
 document.querySelector('.btn-sd').addEventListener('click', function() {
-    // WebSocketが接続されているか確認
-    if (websocket && websocket.readyState === WebSocket.OPEN) {
+  // WebSocketが接続されているか確認
+  if (websocket && websocket.readyState === WebSocket.OPEN) {
+    if (isRemoteSdActive === true) {
+      const result = confirm("SDの記録を停止しますか？");
+      if (!result) {
+        return; // ユーザーがキャンセルした場合は処理を中断
+      }
+    }
       websocket.send("CMD_SD"); // ESP32にコマンドを送信
       console.log("Sent: CMD_SD");
 

@@ -226,6 +226,11 @@ server.serveStatic("/", LittleFS, "/")
       sendStatusMessage(camera_in_use ? "Camera is active" : "Camera is inactive");
       last_camera_in_use = camera_in_use;
     }
+    String jsonString = "{";
+    jsonString += "\"sd_active\":" + String(isRemoteSdActive ? "true" : "false") + ",";
+    jsonString += "\"cam_active\":" + String(camera_in_use ? "true" : "false");
+    jsonString += "}";
+    ws.textAll(jsonString);
     delay(10);
   }
   delay(10);
