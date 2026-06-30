@@ -226,7 +226,12 @@ server.serveStatic("/", LittleFS, "/")
       sendStatusMessage(camera_in_use ? "Camera is active" : "Camera is inactive");
       last_camera_in_use = camera_in_use;
     }
-    delay(10);
+    String jsonString = "{";
+    jsonString += "\"sd_active\":" + String(isRemoteSdActive ? "true" : "false") + ",";
+    jsonString += "\"cam_active\":" + String(camera_in_use ? "true" : "false");
+    jsonString += "}";
+    ws.textAll(jsonString);
+    delay(50);
   }
   delay(10);
   while(digitalRead(tact) == LOW)
@@ -347,13 +352,7 @@ void save(bool end) {
     sendStatusMessage("saved data and closed file");
     measureData.clear();
 
-      String jsonString = "{";
-    jsonString += "\"sd_active\":" + String(isRemoteSdActive ? "true" : "false") + ",";
-    jsonString += "\"cam_active\":" + String(camera_in_use ? "true" : "false");
-    jsonString += "}";
 
-    // 接続されているすべてのブラウザへデータを送信
-    ws.textAll(jsonString);
 
   Serial.println("press the tact switch to restart...");
   sendStatusMessage("press the button to restart...");
@@ -362,7 +361,14 @@ void save(bool end) {
       sendStatusMessage(camera_in_use ? "Camera is active" : "Camera is inactive");
       last_camera_in_use = camera_in_use;
     }
-      delay(10);
+    String jsonString = "{";
+    jsonString += "\"sd_active\":" + String(isRemoteSdActive ? "true" : "false") + ",";
+    jsonString += "\"cam_active\":" + String(camera_in_use ? "true" : "false");
+    jsonString += "}";
+
+    // 接続されているすべてのブラウザへデータを送信
+    ws.textAll(jsonString);
+      delay(50);
     }
     delay(10);
   while(digitalRead(tact) == LOW)
