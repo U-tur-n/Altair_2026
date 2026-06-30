@@ -28,7 +28,7 @@ bool GPSbegin() {  //setup()の代わり
   // set the data rate for the SoftwareSerial port!git s
   Serial1.begin(9600, SERIAL_8N1, RX1_PIN, TX1_PIN);
   Serial1.println("Hello, world?");
-    while(!gps.location.isValid()) {
+  
     unsigned long lastTime = 0;
     while (millis() - lastTime < 5000) {
       while (Serial1.available() > 0) {
@@ -54,7 +54,6 @@ bool GPSbegin() {  //setup()の代わり
   
   }
   return true;
-}
 
 void execute() {  // run over and over
   while (Serial1.available() > 0) {
@@ -64,12 +63,9 @@ void execute() {  // run over and over
     if (gps.location.isUpdated()) {
       latitude = gps.location.lat();
       longitude = gps.location.lng();
-      // Serial.print(millis());
-      // Serial.print(", ");
-      // Serial.print(gps.location.lat(), 6);
-      // Serial.print(", ");
-      // Serial.println(gps.location.lng(), 6);
     }
+    float dist_x = (longitude - set_longitude) * (6378137/sqrt(1 - 2.71828 * 2.71828 * sin((longitude + set_longitude)/2) * sin((longitude - set_longitude)/2))) * cos((latitude + set_latitude)/2);
+    float dist_y = (latitude - set_latitude) * (6378137*((1 - 2.71828 * 2.71828)/(sqrt(1 - 2.71828 * 2.71828 * sin((longitude + set_longitude)/2) * sin((longitude - set_longitude)/2)))));
   }
 }
 
