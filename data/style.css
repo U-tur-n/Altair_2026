@@ -65,10 +65,10 @@ body {
 .video-feed {
 background-color: #333; /* 読み込み前の背景色（黒寄り） */
     width: 100%;
-    flex-grow: 1;
-    min-height: 320px;
+    aspect-ratio: 4 / 3;    /* アスペクト比を4:3に固定 */
+    height: auto;           /* 高さを自動計算に変更 */
     margin-top: 5px;
-    object-fit: cover; /* 枠に合わせてトリミングしつつアスペクト比を維持 */
+    object-fit: cover;      /* 枠に合わせてトリミングしつつアスペクト比を維持 */
     display: block;
 }
 

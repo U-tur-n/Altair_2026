@@ -193,3 +193,39 @@ document.querySelector('.btn-sd').addEventListener('click', function() {
 //         alert("マイコンと接続されていません！");
 //     }
 // });
+
+// =======================================================
+// ダッシュボードを画面サイズに合わせて自動で等倍縮小・拡大する処理
+// =======================================================
+function adjustDashboardScale() {
+  // スマホサイズ（768px以下）の時は等倍縮小を解除し、通常のレスポンシブ表示にする
+  if (window.innerWidth <= 768) {
+    const dashboard = document.querySelector('.dashboard');
+    if (dashboard) {
+      dashboard.style.transform = '';
+    }
+    return;
+  }
+
+  const dashboard = document.querySelector('.dashboard');
+  if (!dashboard) return;
+
+  // CSSで設定したダッシュボードの基準サイズ
+  const baseWidth = 1100;
+  const baseHeight = 750;
+
+  // 画面の枠いっぱいに張り付かないよう、95%（0.95）のサイズに収めるよう計算
+  const scaleX = (window.innerWidth * 0.95) / baseWidth;
+  const scaleY = (window.innerHeight * 0.95) / baseHeight;
+
+  // 縦・横のうち、より狭い方に合わせて等倍縮小（Math.min）
+  // ※もし元のサイズより大きく（拡大）したくない場合は Math.min(scaleX, scaleY, 1) としてください
+  const scale = Math.min(scaleX, scaleY);
+
+  // 計算した倍率をダッシュボード全体に適用
+  dashboard.style.transform = `scale(${scale})`;
+}
+
+// ページ読み込み時と、ウィンドウのサイズが変更された時に実行する
+window.addEventListener('load', adjustDashboardScale);
+window.addEventListener('resize', adjustDashboardScale);

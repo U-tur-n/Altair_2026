@@ -86,6 +86,44 @@
             box-sizing: border-box; /* 右側へのはみ出しを防止 */
         }
 
+        /*  PC等（横幅769px以上）で全体をそのまま等倍縮小する設定 */
+        @media screen and (min-width: 769px) {
+            body {
+                margin: 0;
+                padding: 0;
+                width: 100vw;
+                height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: #000000;
+                overflow: hidden; /* 画面全体のスクロールバーを消す */
+            }
+
+            .dashboard {
+                /* 縮小・拡大の基準となる固定サイズ（デザインが崩れない理想のサイズ） */
+                width: 1100px !important; 
+                height: 750px !important; /* コンテンツが綺麗に収まる高さ */
+                flex-direction: row !important;
+                position: relative;
+                transform-origin: center center; /* 中央を基準に縮小 */
+                flex-shrink: 0; /* 意図しない潰れを防止 */
+                box-sizing: border-box;
+            }
+
+            /* カメラ映像は4:3の比率を維持 */
+            .video-feed {
+                width: 100%;
+                aspect-ratio: 4 / 3;
+                height: auto !important;
+            }
+
+            /* 右側ログウィンドウの高さも固定値に戻す */
+            .status-box {
+                height: 130px !important;
+            }
+        }
+
         /* レスポンシブ対応 (タブレット・スマホ向け) */
         @media screen and (max-width: 768px) {
             /* スマホ表示ではロゴを最上部中央に配置 */
@@ -124,7 +162,6 @@
             }
 
             .video-feed {
-                min-height: 250px;
                 border-radius: 6px;
             }
         }
