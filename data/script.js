@@ -96,7 +96,25 @@ function initWebSocket() {
   };
 }
 
-window.addEventListener("load", initWebSocket, false);
+// --- ページ読み込み完了時の処理 ---
+window.addEventListener("load", function() {
+  // ① アクセスしてきた端末・ブラウザの情報を取得
+  const ua = navigator.userAgent;
+  
+  // ② iOS(iPhone/iPad/iPod) または Mac版Safariかどうかの判定条件
+  const isIOS = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isSafari = /Safari/i.test(ua) && !/Chrome/i.test(ua) && !/Edg/i.test(ua);
+
+  // ③ 該当するブラウザ(WebKit系)だった場合、カメラのUIを非表示にする
+  if (isIOS || isSafari) {
+    document.getElementById("btn-camera").style.display = "none";
+    document.getElementById("camera-stream").style.display = "none";
+    console.log("WebKit/iOS detected: Camera UI has been hidden.");
+  }
+
+  // ④ 既存のWebSocket接続を開始
+  initWebSocket();
+}, false);
 
 
 // SD記録の状態を記憶する変数
