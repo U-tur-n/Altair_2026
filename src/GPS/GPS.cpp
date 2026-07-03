@@ -1,7 +1,7 @@
 //ヘッダーファイルをインクルード
 #include <Arduino.h>
 #include "GPS.h"
-#include <TinyGPS++.h>
+#include <TinyGPS++.h> 
 
 // ライブラリのインクルードは行わない(ヘッダーファイルですでに行っているため)
 
