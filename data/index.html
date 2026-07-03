@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Altir Remote Monitoring & Control System</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* ベースレイアウトの柔軟化と背景色の変更 */
+        body {
+            background-color: #000000; /* 背景を黒に変更 */
+            padding: 15px; 
+        }
+        
+        .dashboard {
+            width: 100% !important; /* style.cssの1000px固定を上書き */
+            max-width: 1100px;
+            background-color: #01061f; /* ダッシュボードの背景を濃い紺色に変更 */
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6); /* 背景に合わせて影を調整 */
+            position: relative; /* ロゴ画像を絶対配置するための基準線 */
+            color: #ffffff; /* 基本の文字色を白に設定 */
+        }
+
+        /* ロゴ画像の配置とサイズ調整 */
+        .site-logo {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            height: 90px; 
+            width: auto;
+            object-fit: contain;
+            z-index: 10; /* 他の要素より手前に表示 */
+        }
+
+        /* ダーク背景に合わせてセクション名やステータスラベルの文字色を白に変更 */
+        .section-label, .status-label {
+            color: #ffffff;
+        }
+
+        /* センサー値パネル（テキストボックス）を背景色に馴染む配色に変更 */
+        .data-panel {
+            background-color: #0b143c; /* テキストボックスの背景を少し明るめの紺に変更 */
+            border: 1px solid #20337a; /* 枠線をサイバー感のある青に変更 */
+            border-radius: 6px;
+            color: #ffffff; /* 表示文字の色を白に変更 */
+        }
+
+        /* 表示文字のフォント色を確実に白にするための指定 */
+        .data-panel > div {
+            color: #ffffff;
+        }
+
+        /* 操作ボタンの位置 (margin-topで調整) */
+        .button-area {
+            margin-top: 110px; 
+        }
+
+        /* ボタンの立体感と押し込みアクション (色は維持) */
+        .btn {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-pwr {
+            background-color: #dc3545; /* 視認性の高い赤を維持 */
+        }
+
+        /* ログウィンドウ (指定通り背景色・文字色は変更せず維持) */
+        .status-box {
+            background-color: #1e1e1e;
+            color: #32cd32; /* 明るい緑 */
+            border: none;
+            border-radius: 6px;
+            padding: 12px !important;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+            box-sizing: border-box; /* 右側へのはみ出しを防止 */
+        }
+
+        /* =======================================================
+           PC等（横幅769px以上）で全体をそのまま等倍縮小する設定
+           ======================================================= */
+        @media screen and (min-width: 769px) {
+            body {
+                margin: 0;
+                padding: 0;
+                width: 100vw;
+                height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: #000000;
+                overflow: hidden; /* 画面全体のスクロールバーを消す */
+            }
+
+            .dashboard {
+                /* 縮小・拡大の基準となる固定サイズ（デザインが崩れない理想のサイズ） */
+                width: 1100px !important; 
+                height: 750px !important; /* コンテンツが綺麗に収まる高さ */
+                flex-direction: row !important;
+                position: relative;
+                transform-origin: center center; /* 中央を基準に縮小 */
+                flex-shrink: 0; /* 意図しない潰れを防止 */
+                box-sizing: border-box;
+            }
+
+            /* カメラ映像は4:3の比率を維持 */
+            .video-feed {
+                width: 100%;
+                aspect-ratio: 4 / 3;
+                height: auto !important;
+            }
+
+            /* 右側ログウィンドウの高さも固定値に戻す */
+            .status-box {
+                height: 130px !important;
+            }
+        }
+
+        /* レスポンシブ対応 (タブレット・スマホ向け) */
+        @media screen and (max-width: 768px) {
+            /* スマホ表示ではロゴを最上部中央に配置 */
+            .site-logo {
+                position: relative;
+                top: 0;
+                right: 0;
+                display: block;
+                margin: 0 auto 15px auto;
+                height: 70px; 
+            }
+
+            .dashboard {
+                flex-direction: column; /* 左右の列を縦並びに */
+                gap: 20px;
+                padding: 15px;
+            }
+
+            .data-panel > div {
+                font-size: 20px; /* スマホ向けにフォントサイズを微調整 */
+            }
+
+            .button-area {
+                flex-direction: row; /* スマホではボタンを横に並べて省スペース化 */
+                justify-content: space-between;
+                gap: 15px;
+                margin-top: 30px; /* スマホ表示用ボタン上の余白 */
+                margin-bottom: 20px;
+            }
+
+            .btn {
+                width: 100%;
+                flex: 1;
+                font-size: 24px;
+                height: 80px;
+            }
+
+            .video-feed {
+                border-radius: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <img src="mark_logo_cmyk.png" alt="Altair Logo" class="site-logo">
+
+        <div class="col-left">
+            <div class="section-label">加速度 [m/s&sup2;]</div>
+            <div class="data-panel">
+                <div>x : <span id="ax">-</span></div>
+                <div>y : <span id="ay">-</span></div>
+                <div>z : <span id="az">-</span></div>
+            </div>
+
+            <div class="section-label">オイラー角 (ZYX) [deg]</div>
+            <div class="data-panel">
+                <div>x : <span id="ox">-</span></div>
+                <div>y : <span id="oy">-</span></div>
+                <div>z : <span id="oz">-</span></div>
+            </div>
+
+            <div class="section-label">
+                <span style="margin-right: 15px;">緯度・経度 [deg]</span> 高度 [m]
+            </div>
+            <div class="data-panel">
+                <div>緯 : <span id="lat">-</span></div>
+                <div>経 : <span id="lng">-</span></div>
+                <div>高 : <span id="alt">-</span></div>
+            </div>
+
+            <button id="btn-camera" class="btn" style="width: 100%; height: 45px; font-size: 16px; margin-bottom: 5px; background-color: #A4C2F4; border-radius: 8px; cursor: pointer;">
+                カメラ映像を取得 (1台のみ)
+            </button>
+            <img id="camera-stream" class="video-feed" alt="Camera Stream">
+        </div>
+
+        <div class="col-right">
+            <div class="button-area">
+                <button class="btn btn-sd">SD記録<br>開始</button>
+                <button class="btn btn-pwr">電装動作</button>
+            </div>
+
+            <div class="status-area">
+                <div class="status-label">接続状態 : <span id="ws-status" style="color: red;">切断</span></div>
+                <div class="status-label" style="margin-top: 15px;">ステータスメッセージ</div>
+                <div class="status-box" id="status-msg"></div>
+                <div class="footer-text" style="color: #8f9bb3; font-size: 14px; margin-top: 10px;">Altair Remote Monitoring & Control System Ver. 1.2.9</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
