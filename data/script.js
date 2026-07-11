@@ -70,6 +70,12 @@ function initWebSocket() {
         document.getElementById("lng").innerText = data.longitude;
       if (data.altitude !== undefined)
         document.getElementById("alt").innerText = data.altitude;
+      if (data.x_dist !== undefined)
+        document.getElementById("x_dist").innerText = data.x_dist;
+      if (data.y_dist !== undefined)
+        document.getElementById("y_dist").innerText = data.y_dist;
+      if (data.dist !== undefined)
+        document.getElementById("dist").innerText = data.dist;
       if (data.sd_active !== undefined) {
         if (data.sd_active !== isRemoteSdActive) {
           isRemoteSdActive = data.sd_active;
