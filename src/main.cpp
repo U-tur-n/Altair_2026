@@ -265,6 +265,7 @@ void loop() {
     az = BNO::az;
     // q = BNO::q;
 
+    float ln;
     measureData.push_back(altitude);
     measureData.push_back(latitude);
     measureData.push_back(longitude);
@@ -275,6 +276,7 @@ void loop() {
     measureData.push_back(ay); 
     measureData.push_back(az);
     // measureData.push_back(q);
+    measureData.push_back(9999999.99); //この値を受け取ったらcsvで改行
 
     Serial.print(altitude);
     Serial.print(", ");
@@ -344,7 +346,7 @@ void save(bool end) {
     {
       fp.print(data);
       i++;
-      if (i % 7 == 0) { // 7個のデータごとに改行
+      if (data == 9999999.99) { // この値を受け取ったら改行
         fp.println();
       } else {
         fp.print(",");
