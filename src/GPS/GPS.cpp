@@ -66,6 +66,7 @@ void execute() {  // run over and over
     }
     float dist_x = (longitude - set_longitude) * (6378137/sqrt(1 - 2.71828 * 2.71828 * sin((longitude + set_longitude)/2) * sin((longitude - set_longitude)/2))) * cos((latitude + set_latitude)/2);
     float dist_y = (latitude - set_latitude) * (6378137*((1 - 2.71828 * 2.71828)/(sqrt(1 - 2.71828 * 2.71828 * sin((longitude + set_longitude)/2) * sin((longitude - set_longitude)/2)))));
+    Srial.print("Distance X: ");
   }
 }
 
