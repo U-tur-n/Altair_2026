@@ -104,6 +104,7 @@ void initWebSocket() {
   server.addHandler(&ws);
 }
 
+
 // put function declarations here:
 void save(bool);
 
@@ -333,6 +334,11 @@ void loop() {
       save(false);
     }
   lastTime = millis();
+  }
+
+  // リモートSD記録がONの場合、指定間隔でタイムラプスを保存
+  if (isRemoteSdActive) {
+    saveTimelapseImage();
   }
 }
 
