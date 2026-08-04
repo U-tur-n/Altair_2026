@@ -134,7 +134,7 @@ void startCameraServer() {
 }
 
 void saveTimelapseImage() {
-  if (millis() - lastCaptureTime >= captureInterval) {
+  // if (millis() - lastCaptureTime >= captureInterval) {
     lastCaptureTime = millis();
 
     // カメラからフレームを取得
@@ -162,5 +162,5 @@ void saveTimelapseImage() {
 
     // フレームバッファのメモリを解放（必須）
     esp_camera_fb_return(fb);
-  }
+  // }
 }

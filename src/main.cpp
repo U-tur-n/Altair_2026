@@ -335,13 +335,15 @@ void loop() {
     if(measureData.size() >= 2100){
       save(false);
     }
+
+  if (isRemoteSdActive) {
+    saveTimelapseImage();
+  }
   lastTime = millis();
   }
 
   // リモートSD記録がONの場合、指定間隔でタイムラプスを保存
-  if (isRemoteSdActive) {
-    saveTimelapseImage();
-  }
+
 }
 
 // put function definitions here:
