@@ -277,7 +277,7 @@ void loop() {
     measureData.push_back(ay); 
     measureData.push_back(az);
     // measureData.push_back(q);
-    measureData.push_back(9999999.99); //この値を受け取ったらcsvで改行
+    measureData.push_back(9999); //この値を受け取ったらcsvで改行
 
     Serial.print(altitude);
     Serial.print(", ");
@@ -352,7 +352,7 @@ void save(bool end) {
     {
       fp.print(data);
       i++;
-      if (data == 9999999.99) { // この値を受け取ったら改行
+      if (data == 9999) { // この値を受け取ったら改行
         fp.println();
       } else {
         fp.print(",");
