@@ -146,7 +146,7 @@ void saveTimelapseImage() {
 
     // 連番ファイル名を生成 (例: /img_00001.jpg)
     char imgFileName[32];
-    snprintf(imgFileName, sizeof(imgFileName), "/img_%05d.jpg", imageCount);
+    snprintf(imgFileName, sizeof(imgFileName), "CAM/img_%05d.jpg", imageCount);
 
     // SDカードへ書き込み
     // ※SD.hライブラリがCSピンを自動制御します
