@@ -18,7 +18,7 @@ float dist;
 const int RX1_PIN = 44;
 const int TX1_PIN = 43;
 const float pi = 3.14159265358979323846;
-const float rad = 180.0 / pi;
+const float rad = pi / 180;
 const float Rx = 6378137.000; //長半径
 const float Ry = 6356752.314245; //短半径
 
