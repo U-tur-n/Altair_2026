@@ -264,7 +264,7 @@ void loop() {
     ax = BNO::ax;
     ay = BNO::ay;
     az = BNO::az;
-    // q = BNO::q;
+    q = BNO::q;
 
     float ln;
     measureData.push_back(altitude);
@@ -276,7 +276,7 @@ void loop() {
     measureData.push_back(ax);
     measureData.push_back(ay); 
     measureData.push_back(az);
-    // measureData.push_back(q);
+    measureData.push_back(q);
     measureData.push_back(9999); //この値を受け取ったらcsvで改行
 
     Serial.print(altitude);
@@ -296,8 +296,8 @@ void loop() {
     Serial.print(ay);
     Serial.print(", ");
     Serial.println(az);
-    // Serial.print(", ");
-    // Serial.println(q);
+    Serial.print(", ");
+    Serial.println(q);
 
     // すでに取得済みの変数を元に、JSONフォーマットの文字列を生成
     // (ArduinoJsonライブラリを使用しても良いですが、軽量化のため文字列結合で生成しています)
