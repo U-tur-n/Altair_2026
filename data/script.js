@@ -65,10 +65,6 @@ function initWebSocket() {
       if (data.az !== undefined)
         document.getElementById("az").innerText = data.az;
       if (data.latitude !== undefined)
-        document.getElementById("lat").innerText = data.latitude;
-      if (data.longitude !== undefined)
-        document.getElementById("lng").innerText = data.longitude;
-      if (data.altitude !== undefined)
         document.getElementById("alt").innerText = data.altitude;
       if (data.x_dist !== undefined)
         document.getElementById("x_dist").innerText = data.x_dist;
