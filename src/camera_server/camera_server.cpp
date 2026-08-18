@@ -2,7 +2,6 @@
 #include "esp_camera.h"
 #include "esp_http_server.h"
 #include "camera_server.h"
-#include "SD.h"
 
 // --- XIAO ESP32-S3 Sense カメラピン定義 ---
 #define PWDN_GPIO_NUM     -1
@@ -25,11 +24,6 @@
 httpd_handle_t stream_httpd = NULL;
 
 bool camera_in_use = false;
-
-// タイムラプス用の変数
-unsigned long lastCaptureTime = 0;
-int imageCount = 0;
-const unsigned long captureInterval = 200; // 撮影間隔(ミリ秒)。1000なら1秒に1枚
 
 void initCamera() {
   camera_config_t config;
@@ -131,36 +125,3 @@ void startCameraServer() {
     httpd_register_uri_handler(stream_httpd, &stream_uri);
     Serial.println("Camera Stream Server started on port 81");
   }
-}
-
-void saveTimelapseImage() {
-  // if (millis() - lastCaptureTime >= captureInterval) {
-    lastCaptureTime = millis();
-
-    // カメラからフレームを取得
-    camera_fb_t * fb = esp_camera_fb_get();
-    if (!fb) {
-      Serial.println("Camera capture failed");
-      return;
-    }
-
-    // 連番ファイル名を生成 (例: /img_00001.jpg)
-    char imgFileName[32];
-    snprintf(imgFileName, sizeof(imgFileName), "CAM/img_%05d.jpg", imageCount);
-
-    // SDカードへ書き込み
-    // ※SD.hライブラリがCSピンを自動制御します
-    File imgFile = SD.open(imgFileName, FILE_WRITE);
-    if (!imgFile) {
-      Serial.println("Failed to open image file");
-    } else {
-      imgFile.write(fb->buf, fb->len);
-      imgFile.close();
-      Serial.printf("Saved timelapse image: %s\n", imgFileName);
-      imageCount++;
-    }
-
-    // フレームバッファのメモリを解放（必須）
-    esp_camera_fb_return(fb);
-  // }
-}

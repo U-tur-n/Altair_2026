@@ -5,6 +5,5 @@ extern bool camera_in_use;
 
 void initCamera();
 void startCameraServer();
-void saveTimelapseImage();
 
 #endif
