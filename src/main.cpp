@@ -27,7 +27,7 @@ float az;
 float q;
 
 bool isRemoteSdActive = false; //記録開始用フラグ
-// bool isRemotePwrActive = false;//電装動作用フラグ
+bool isRemotePwrActive = false;//電装動作用フラグ
 
 bool last_camera_in_use = false;
 
@@ -71,11 +71,11 @@ AwsFrameInfo *info = (AwsFrameInfo*)arg;
       
       // ここにSD記録開始の処理や save() 関数を呼び出す処理を書くことができます
     } 
-    // else if (message == "CMD_PWR") {
-    //   isRemotePwrActive = !isRemotePwrActive;
-    //   Serial.print("電装動作フラグが変更されました: ");
-    //   Serial.println(isRemotePwrActive ? "ON" : "OFF");
-    // }
+    else if (message == "CMD_PWR") {
+      isRemotePwrActive = true;
+      Serial.print("電装動作フラグが変更されました: ");
+      Serial.println(isRemotePwrActive ? "ON" : "OFF");
+    }
 
     
   }
@@ -312,7 +312,8 @@ void loop() {
     jsonString += "\"dist\":" + String(dist, 1) + ",";
     jsonString += "\"altitude\":" + String(altitude, 1) + ",";
     jsonString += "\"sd_active\":" + String(isRemoteSdActive ? "true" : "false") + ",";
-    jsonString += "\"cam_active\":" + String(camera_in_use ? "true" : "false");
+    jsonString += "\"cam_active\":" + String(camera_in_use ? "true" : "false") + ",";
+    jsonString += "\"pwr_active\":" + String(isRemotePwrActive ? "true" : "false");
     // jsonString += "\"msg\":\"Data updated at " + String(currentMillis / 1000) + "s\"";
     jsonString += "}";
 

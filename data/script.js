@@ -84,6 +84,18 @@ function initWebSocket() {
           }
         }
       }
+      if (data.pwr_active !== undefined) {
+        if (data.pwr_active !== isRemotePwrActive) {
+          isRemotePwrActive = data.pwr_active;
+          if (isRemotePwrActive) {
+            btnPwr.innerHTML = "電装動作済";
+            btnPwr.style.backgroundColor = "#b9b9b9"; // 黄色
+          } else {
+            btnPwr.innerHTML = "電装動作";
+            btnPwr.style.backgroundColor = "#dc3545"; // 青色
+          }
+        }
+      }
         if (data.cam_active !== undefined) {
           globalCameraActive = data.cam_active;
         }
@@ -185,6 +197,37 @@ document.querySelector('.btn-sd').addEventListener('click', function() {
         alert("マイコンと接続されていません！");
     }
 });
+let isRemotePwrActive = false;
+const btnPwr = document.querySelector(".btn-pwr");
+document.querySelector(".btn-pwr").addEventListener("click", function () {
+  // WebSocketが接続されているか確認
+  if (websocket && websocket.readyState === WebSocket.OPEN) {
+    if (isRemotePwrActive === false) {
+      const result = confirm("電装動作をしますか？");
+      if (!result) {
+        return; // ユーザーがキャンセルした場合は処理を中断
+      }
+    }
+    websocket.send("CMD_PWR"); // ESP32にコマンドを送信
+    console.log("Sent: CMD_PWR");
+
+    // UIの状態を反転させる
+    // if (!isRemoteSdActive) {
+    //   // 記録開始状態へ変更
+    //   btnSd.innerHTML = "SD記録<br>停止"; // <br>で改行を維持
+    //   btnSd.style.backgroundColor = "#FFD700"; // 指定の黄色
+    //   isRemoteSdActive = true;
+    // } else {
+    //   // 記録停止（初期）状態へ戻す
+    //   btnSd.innerHTML = "SD記録<br>開始";
+    //   btnSd.style.backgroundColor = "#a4c2f4"; // 元の青色
+    //   isRemoteSdActive = false;
+    // }
+  } else {
+    alert("マイコンと接続されていません！");
+  }
+});
+
 
 // 「電装動作」ボタンのクリックイベント
 // document.querySelector('.btn-pwr').addEventListener('click', function() {
