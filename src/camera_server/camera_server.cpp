@@ -125,3 +125,4 @@ void startCameraServer() {
     httpd_register_uri_handler(stream_httpd, &stream_uri);
     Serial.println("Camera Stream Server started on port 81");
   }
+}

@@ -338,7 +338,6 @@ void loop() {
     }
 
   if (isRemoteSdActive) {
-    saveTimelapseImage();
   }
   lastTime = millis();
   }
