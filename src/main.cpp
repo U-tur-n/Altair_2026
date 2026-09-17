@@ -7,6 +7,7 @@
 #include "BME/BME.h"
 #include "BNO/BNO.h"
 #include "GPS/GPS.h"
+#include "Servo/servo.h"
 #include "camera_server/camera_server.h"
 
 #define tact 1 // D0
@@ -340,6 +341,11 @@ void loop() {
   if (isRemoteSdActive) {
   }
   lastTime = millis();
+
+  if (isRemotePwrActive) {
+    servo::execute();
+    Serial.println("Servo is operating");
+    sendStatusMessage("Servo is operating");
   }
 
   // リモートSD記録がONの場合、指定間隔でタイムラプスを保存
