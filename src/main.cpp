@@ -208,6 +208,8 @@ server.serveStatic("/", LittleFS, "/")
     //   ;
   }
   delay(100);
+  servo::begin();
+  delay(100);
   //ボーレートを115200
 
     //タクトスイッチが押されたら計測開始
