@@ -337,6 +337,7 @@ void loop() {
     if(measureData.size() >= 2100){
       save(false);
     }
+  }
 
   if (isRemoteSdActive) {
   }
