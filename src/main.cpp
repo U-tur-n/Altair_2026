@@ -7,6 +7,7 @@
 #include "BME/BME.h"
 #include "BNO/BNO.h"
 #include "GPS/GPS.h"
+#include "Servo/servo.h"
 #include "camera_server/camera_server.h"
 
 #define tact 1 // D0
@@ -187,24 +188,24 @@ server.serveStatic("/", LittleFS, "/")
     sendStatusMessage("BME280 initialized successfully.");
   } else {
     sendStatusMessage("BME280 initialization failed.");
-    // while (1)
-    //   ;
+    while (1)
+      ;
   }
   delay(100);
   if(BNO::BNObegin()){
     sendStatusMessage("BNO055 initialized successfully.");
   } else {
     sendStatusMessage("BNO055 initialization failed.");
-    // while (1)
-    //   ;
+    while (1)
+      ;
   }
   delay(100);
   if(GPS::GPSbegin()){
     sendStatusMessage("GPS initialized successfully.");
   } else {
     sendStatusMessage("GPS initialization failed.");
-    // while (1)
-    //   ;
+    while (1)
+      ;
   }
   delay(100);
   //ボーレートを115200
@@ -340,6 +341,11 @@ void loop() {
   if (isRemoteSdActive) {
   }
   lastTime = millis();
+
+  if (isRemotePwrActive) {
+    servo::execute();
+    Serial.println("Servo is operating");
+    sendStatusMessage("Servo is operating");
   }
 
   // リモートSD記録がONの場合、指定間隔でタイムラプスを保存
