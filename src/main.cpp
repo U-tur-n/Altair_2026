@@ -336,14 +336,16 @@ void loop() {
   ;
       save(true);
     }
+
     if(measureData.size() >= 2100){
       save(false);
     }
+    
+  lastTime = millis();
   }
 
   if (isRemoteSdActive) {
   }
-  lastTime = millis();
 
   if (isRemotePwrActive) {
     servo::execute();
