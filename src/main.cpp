@@ -170,8 +170,8 @@ server.serveStatic("/", LittleFS, "/")
     if (SD.begin(SD_CS) == false) {
     Serial.println("SD card or file not present");
     sendStatusMessage("SD card or file not present");
-    while (1)
-      ;
+    // while (1)
+    //   ;
     }
     
   Serial.println("OK");
@@ -215,17 +215,17 @@ server.serveStatic("/", LittleFS, "/")
     //タクトスイッチが押されたら計測開始
   Serial.print("Opening the file...");
     sendStatusMessage("Opening the file...");
-  fp = SD.open(fileName, FILE_WRITE);
-  if (fp == false) {
-    Serial.println("cannot open the file");
-    sendStatusMessage("cannot open the file");
-    while (1)
-      ;
-  }
+  // fp = SD.open(fileName, FILE_WRITE);
+  // if (fp == false) {
+  //   Serial.println("cannot open the file");
+  //   sendStatusMessage("cannot open the file");
+  //   while (1)
+  //     ;
+  // }
   Serial.println("OK");
   sendStatusMessage("OK");
 
-  fp.println("time, altitude, latitude, longitude, ax, ay, az, q");
+  // fp.println("time, altitude, latitude, longitude, ax, ay, az, q");
   Serial.println("press the tact switch...");
   sendStatusMessage("press the button...");
   while(digitalRead(tact) == HIGH && isRemoteSdActive == false) {
@@ -362,30 +362,30 @@ void save(bool end) {
   int i = 0;
   digitalWrite(SD_CS, LOW);
     for (double data : measureData)
-    {
-      fp.print(data);
-      i++;
-      if (data == 9999) { // この値を受け取ったら改行
-        fp.println();
-      } else {
-        fp.print(",");
-      }
-      // fp.print(",");
-      // fp.println(data); // q
-      // Serial.println("receive any key...");
-      // if (Serial.available() != 0){
-      //   while(1)
-      //     ;
-      // }
-    }
+    // {
+    //   fp.print(data);
+    //   i++;
+    //   if (data == 9999) { // この値を受け取ったら改行
+    //     fp.println();
+    //   } else {
+    //     fp.print(",");
+    //   }
+    //   // fp.print(",");
+    //   // fp.println(data); // q
+    //   // Serial.println("receive any key...");
+    //   // if (Serial.available() != 0){
+    //   //   while(1)
+    //   //     ;
+    //   // }
+    // }
   if (end == false) { // データ保存のみ
-    fp.flush();
+    // fp.flush();
     Serial.println("saved data");
     sendStatusMessage("saved data");
     measureData.clear();
     digitalWrite(SD_CS, HIGH);
   } else {
-    fp.close(); // ファイルを閉じる(スイッチが押された場合)
+    // fp.close(); // ファイルを閉じる(スイッチが押された場合)
     isRemoteSdActive = false; // 記録フラグをfalseに戻す
     Serial.println("saved data and closed file");
     sendStatusMessage("saved data and closed file");
