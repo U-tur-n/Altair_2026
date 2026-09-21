@@ -26,8 +26,8 @@ float lastTime = 0.0;
 
 float altitude;
 
-void begin() {
-  Serial.begin(115200);
+bool BMEbegin() {
+  // Serial.begin(115200);
 delay(1000); // シリアルモニタが開くまで待機
 
   // MicroSD側のCSピンをHIGHにして、SPIバスでの信号衝突を防ぐ
@@ -39,7 +39,8 @@ delay(1000); // シリアルモニタが開くまで待機
   // BME280の初期化チェック
   if (!bme.begin(0x76)) {
     Serial.println("エラー: BME280 センサが見つかりません。配線を確認してください。");
-    while (1);
+    bool result = false;
+    return result; // 初期化失敗
   }
 
   // 起動直後の気圧を数回空読みして安定させる
@@ -57,6 +58,9 @@ delay(1000); // シリアルモニタが開くまで待機
   Serial.println("---------------------------------------");
 
   digitalWrite(cs, HIGH); // BME280のCSピンをHIGHにしてSPIバスを解放
+
+  bool result = true; // 初期化成功
+  return result;
 }
 
 void execute() {

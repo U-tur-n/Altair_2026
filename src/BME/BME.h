@@ -7,6 +7,6 @@
 
 namespace BME{
     extern float altitude;
-    void begin();
+    bool BMEbegin();
     void execute();
 }
