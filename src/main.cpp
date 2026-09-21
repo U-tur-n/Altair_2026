@@ -305,15 +305,16 @@ void loop() {
     // すでに取得済みの変数を元に、JSONフォーマットの文字列を生成
     // (ArduinoJsonライブラリを使用しても良いですが、軽量化のため文字列結合で生成しています)
     String jsonString = "{";
-    jsonString += "\"ax\":" + String(ax, 2) + ",";
-    jsonString += "\"ay\":" + String(ay, 2) + ",";
-    jsonString += "\"az\":" + String(az, 2) + ",";
-    jsonString += "\"latitude\":" + String(latitude, 6) + ",";
-    jsonString += "\"longitude\":" + String(longitude, 6) + ",";
-    jsonString += "\"x_dist\":" + String(x_dist, 1) + ",";
-    jsonString += "\"y_dist\":" + String(y_dist, 1) + ",";
-    jsonString += "\"dist\":" + String(dist, 1) + ",";
-    jsonString += "\"altitude\":" + String(altitude, 1) + ",";
+    jsonString += "\"ax\":\"" + String(ax, 2) + "\",";
+    jsonString += "\"ay\":\"" + String(ay, 2) + "\",";
+    jsonString += "\"az\":\"" + String(az, 2) + "\",";
+    jsonString += "\"q\":\"" + String(q, 2) + "\",";
+    jsonString += "\"latitude\":\"" + String(latitude, 6) + "\",";
+    jsonString += "\"longitude\":\"" + String(longitude, 6) + "\",";
+    jsonString += "\"x_dist\":\"" + String(x_dist, 1) + "\",";
+    jsonString += "\"y_dist\":\"" + String(y_dist, 1) + "\",";
+    jsonString += "\"dist\":\"" + String(dist, 1) + "\",";
+    jsonString += "\"altitude\":\"" + String(altitude, 1) + "\",";
     jsonString += "\"sd_active\":" + String(isRemoteSdActive ? "true" : "false") + ",";
     jsonString += "\"cam_active\":" + String(camera_in_use ? "true" : "false") + ",";
     jsonString += "\"pwr_active\":" + String(isRemotePwrActive ? "true" : "false");
