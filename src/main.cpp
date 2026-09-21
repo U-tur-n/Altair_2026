@@ -238,7 +238,7 @@ server.serveStatic("/", LittleFS, "/")
     jsonString += "\"cam_active\":" + String(camera_in_use ? "true" : "false");
     jsonString += "}";
     ws.textAll(jsonString);
-    delay(50);
+    delay(200);
   }
   delay(10);
   while(digitalRead(tact) == LOW)
@@ -408,12 +408,12 @@ void save(bool end) {
 
     // 接続されているすべてのブラウザへデータを送信
     ws.textAll(jsonString);
-      delay(50);
+      delay(200);
     }
-    delay(10);
   while(digitalRead(tact) == LOW)
   ;
   isRemoteSdActive = true; // リモートSD記録フラグを強制的にtrueに設定
+    delay(2000);
   sendStatusMessage("start");
 }
 }
