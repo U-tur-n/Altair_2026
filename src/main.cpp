@@ -65,17 +65,25 @@ AwsFrameInfo *info = (AwsFrameInfo*)arg;
     Serial.println(message);
 
     // --- メッセージの内容に応じて変数を変更 ---
-    if (message == "CMD_SD" ) { //|| isRemoteSdActive==true
+if (message == "CMD_SD" ) { //|| isRemoteSdActive==true
+      unsigned long CMD_SDlasttime;
+    if (millis() - CMD_SDlasttime > 1000){
       isRemoteSdActive = !isRemoteSdActive; // true/falseを反転
       Serial.print("SD記録フラグが変更されました: ");
       Serial.println(isRemoteSdActive ? "ON" : "OFF");
-      
+      CMD_SDlasttime = millis();
+
       // ここにSD記録開始の処理や save() 関数を呼び出す処理を書くことができます
+    }
     } 
     else if (message == "CMD_PWR") {
+      unsigned long CMD_PWRlasttime;
+      if (millis() - CMD_PWRlasttime > 1000) {
       isRemotePwrActive = true;
       Serial.print("電装動作フラグが変更されました: ");
       Serial.println(isRemotePwrActive ? "ON" : "OFF");
+        CMD_PWRlasttime = millis();
+      }
     }
 
     
@@ -244,6 +252,11 @@ server.serveStatic("/", LittleFS, "/")
   while(digitalRead(tact) == LOW)
   ;
   isRemoteSdActive = true; // リモートSD記録フラグを強制的にtrueに設定
+        String jsonString = "{";
+    jsonString += "\"sd_active\":" + String(isRemoteSdActive ? "true" : "false") + ",";
+    jsonString += "\"cam_active\":" + String(camera_in_use ? "true" : "false");
+    jsonString += "}";
+    ws.textAll(jsonString);
   sendStatusMessage("start");
 }
 
@@ -340,6 +353,7 @@ void loop() {
       Serial.println("stop");
       sendStatusMessage("stop");
       
+    
   while(digitalRead(tact) == LOW)
   ;
       save(true);
@@ -369,7 +383,7 @@ void loop() {
 void save(bool end) {
   int i = 0;
   digitalWrite(SD_CS, LOW);
-    for (double data : measureData)
+    // for (double data : measureData)
     // {
     //   fp.print(data);
     //   i++;
@@ -421,6 +435,11 @@ void save(bool end) {
   while(digitalRead(tact) == LOW)
   ;
   isRemoteSdActive = true; // リモートSD記録フラグを強制的にtrueに設定
+        String jsonString = "{";
+    jsonString += "\"sd_active\":" + String(isRemoteSdActive ? "true" : "false") + ",";
+    jsonString += "\"cam_active\":" + String(camera_in_use ? "true" : "false");
+    jsonString += "}";
+    ws.textAll(jsonString);
   sendStatusMessage("start");
 }
 }
