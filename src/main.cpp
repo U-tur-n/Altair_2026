@@ -269,9 +269,9 @@ void loop() {
     Serial.print(", ");
 
     
-  // sendStatusMessage("BME ");
-  //   BME::execute();
-  //   sendStatusMessage("executed");
+  sendStatusMessage("BME ");
+    BME::execute();
+    sendStatusMessage("executed");
   sendStatusMessage("GPS ");
     GPS::execute();
     sendStatusMessage("executed");
@@ -376,7 +376,6 @@ void loop() {
   }
 
   // リモートSD記録がONの場合、指定間隔でタイムラプスを保存
-
 }
 
 // put function definitions here:
