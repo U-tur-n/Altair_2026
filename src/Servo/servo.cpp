@@ -1,7 +1,7 @@
 #include "servo.h"
 
 namespace servo{
-  const int servoPin = 5;
+  const int servoPin = 2;
   int DutyCycle = 500;
 
   void begin() {
