@@ -269,16 +269,9 @@ void loop() {
     Serial.print(millis());
     Serial.print(", ");
 
-    
-  sendStatusMessage("BME ");
     BME::execute();
-    sendStatusMessage("executed");
-  sendStatusMessage("GPS ");
     GPS::execute();
-    sendStatusMessage("executed");
-    // sendStatusMessage("BNO");
-    // BNO::execute();
-    // sendStatusMessage("executed");
+    BNO::execute();
     altitude = BME::altitude;
     latitude = GPS::latitude;
     longitude = GPS::longitude;
