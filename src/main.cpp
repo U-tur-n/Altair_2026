@@ -15,6 +15,7 @@
 #define BME_CS 3
 
 unsigned long lastTime = 0;
+unsigned long ws_lastTime = 0;
 
 float altitude = BME::altitude;
 float latitude = GPS::latitude;
@@ -130,7 +131,7 @@ SPI.begin();
   digitalWrite(SD_CS, HIGH);
   digitalWrite(BME_CS, HIGH);
 
-  
+
 
   Serial.begin(115200);
   // while(!Serial);
@@ -324,6 +325,8 @@ void loop() {
 
     // すでに取得済みの変数を元に、JSONフォーマットの文字列を生成
     // (ArduinoJsonライブラリを使用しても良いですが、軽量化のため文字列結合で生成しています)
+    if (millis() - ws_lastTime >= 350) { // 0.35秒ごとにWebSocketで送信
+      ws_lastTime = millis();
     String jsonString = "{";
     jsonString += "\"ax\":\"" + String(ax, 2) + "\",";
     jsonString += "\"ay\":\"" + String(ay, 2) + "\",";
@@ -343,6 +346,8 @@ void loop() {
 
     // 接続されているすべてのブラウザへデータを送信
     ws.textAll(jsonString);
+    ws_lastTime = millis();
+    }
 
     if(camera_in_use != last_camera_in_use){
       sendStatusMessage(camera_in_use ? "Camera is active" : "Camera is inactive");
