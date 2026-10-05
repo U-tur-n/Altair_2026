@@ -23,11 +23,11 @@ namespace servo{
   }
 
   void execute() {
-    if (Serial.available() > 0) {
+    // if (Serial.available() > 0) {
 
-      char inkey = Serial.read();
+    //   char inkey = Serial.read();
 
-      if (inkey == 'a') {
+    //   if (inkey == 'a') {
 
        for (DutyCycle = 500; DutyCycle <= 501; DutyCycle += 1) {//90°回転
           digitalWrite(servoPin, HIGH);
@@ -42,7 +42,7 @@ namespace servo{
           delayMicroseconds(20000 - 501);
 
       }
-    }
-  }
+  //   }
+  // }
 
 }
