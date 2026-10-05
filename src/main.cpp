@@ -30,6 +30,7 @@ float q;
 
 bool isRemoteSdActive = false; //記録開始用フラグ
 bool isRemotePwrActive = false;//電装動作用フラグ
+bool lastRemotePwrActive = false;
 
 bool last_camera_in_use = false;
 
@@ -367,10 +368,11 @@ void loop() {
   if (isRemoteSdActive) {
   }
 
-  if (isRemotePwrActive) {
+  if (isRemotePwrActive != lastRemotePwrActive) {
     servo::execute();
     Serial.println("Servo is operating");
     sendStatusMessage("Servo is operating");
+    lastRemotePwrActive = isRemotePwrActive;
   }
 
   // リモートSD記録がONの場合、指定間隔でタイムラプスを保存
