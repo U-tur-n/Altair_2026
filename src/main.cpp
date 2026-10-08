@@ -186,32 +186,35 @@ server.serveStatic("/", LittleFS, "/")
   //   ;
   
   delay(100);
-  if(BME::BMEbegin()){
-    sendStatusMessage("BME280 initialized successfully.");
-  } else {
-    sendStatusMessage("BME280 initialization failed.");
-    // while (1)
-    //   ;
-  }
+  // if(BME::BMEbegin()){
+  //   sendStatusMessage("BME280 initialized successfully.");
+  // } else {
+  //   sendStatusMessage("BME280 initialization failed.");
+  //   // while (1)
+  //   //   ;
+  // }
   delay(100);
-  if(BNO::BNObegin()){
-    sendStatusMessage("BNO055 initialized successfully.");
-  } else {
-    sendStatusMessage("BNO055 initialization failed.");
-    // while (1)
-    //   ;
-  }
+  // if(BNO::BNObegin()){
+  //   sendStatusMessage("BNO055 initialized successfully.");
+  // } else {
+  //   sendStatusMessage("BNO055 initialization failed.");
+  //   // while (1)
+  //   //   ;
+  // }
   delay(100);
-  if(GPS::GPSbegin()){
-    sendStatusMessage("GPS initialized successfully.");
-  } else {
-    sendStatusMessage("GPS initialization failed.");
-    // while (1)
-    //   ;
-  }
+  // if(GPS::GPSbegin()){
+  //   sendStatusMessage("GPS initialized successfully.");
+  // } else {
+  //   sendStatusMessage("GPS initialization failed.");
+  //   // while (1)
+  //   //   ;
+  // }
   delay(100);
   servo::begin();
   delay(100);
+  Serial.println("Servo OK");
+  sendStatusMessage("Servo OK");
+  delay(1000);
   //ボーレートを115200
 
     //タクトスイッチが押されたら計測開始
@@ -221,6 +224,9 @@ server.serveStatic("/", LittleFS, "/")
   Serial.println("press the tact switch...");
   sendStatusMessage("press the button...");
   while(digitalRead(tact) == HIGH && isRemoteSdActive == false) {
+    if(millis() - ws_lastTime > 500) {
+      ws_lastTime = millis();
+      // Web UIに現在のカメラ状態とリモートSD記録状態を送信
     if(camera_in_use != last_camera_in_use){
       sendStatusMessage(camera_in_use ? "Camera is active" : "Camera is inactive");
       last_camera_in_use = camera_in_use;
@@ -230,8 +236,10 @@ server.serveStatic("/", LittleFS, "/")
     jsonString += "\"cam_active\":" + String(camera_in_use ? "true" : "false");
     jsonString += "}";
     ws.textAll(jsonString);
-    delay(50);
+    ws_lastTime = millis();
+    }
   }
+  
   delay(10);
   while(digitalRead(tact) == LOW)
   ;
