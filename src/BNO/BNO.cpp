@@ -5,7 +5,7 @@
 
 namespace BNO {
 
-Adafruit_BNO055 bno = Adafruit_BNO055(-1, 0x28, &Wire);
+Adafruit_BNO055 bno = Adafruit_BNO055(-1, 0x29, &Wire);
 
 float ax;
 float ay;
