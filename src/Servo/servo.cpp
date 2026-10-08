@@ -8,7 +8,7 @@ namespace servo{
    pinMode(servoPin, OUTPUT);
    Serial.begin(9600);
    // 終点位置(501)から90度の位置(約1450)まで回転
-       for (DutyCycle = 501; DutyCycle <= 1450; DutyCycle += 5) {
+       for (DutyCycle = 500; DutyCycle <= 501; DutyCycle +=1 ) {
           digitalWrite(servoPin, HIGH);
           delayMicroseconds(DutyCycle);
           digitalWrite(servoPin, LOW);
@@ -17,9 +17,9 @@ namespace servo{
 
        // 90度の位置で保持（戻らないように）
        digitalWrite(servoPin, HIGH);
-       delayMicroseconds(1450);
+       delayMicroseconds(501);
        digitalWrite(servoPin, LOW);
-       delayMicroseconds(20000 - 1450);
+       delayMicroseconds(20000 - 501);
   }
 
   void execute() {
@@ -29,7 +29,7 @@ namespace servo{
 
     //   if (inkey == 'a') {
 
-       for (DutyCycle = 500; DutyCycle <= 501; DutyCycle += 1) {//90°回転
+       for (DutyCycle = 1500; DutyCycle <= 1501; DutyCycle += 1) {//90°回転
           digitalWrite(servoPin, HIGH);
           delayMicroseconds(DutyCycle);
           digitalWrite(servoPin, LOW);
@@ -37,9 +37,9 @@ namespace servo{
        }
 
           digitalWrite(servoPin, HIGH);//戻らないように
-          delayMicroseconds(501);
+          delayMicroseconds(1501);
           digitalWrite(servoPin, LOW);
-          delayMicroseconds(20000 - 501);
+          delayMicroseconds(20000 - 1501);
 
       }
   //   }
