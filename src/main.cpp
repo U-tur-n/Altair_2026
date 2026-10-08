@@ -265,7 +265,7 @@ server.serveStatic("/", LittleFS, "/")
 void loop() {
   // put your main code here, to run repeatedly:
   ws.cleanupClients();
-  if(millis() - lastTime >= 200){
+  if(millis() - lastTime >= 50){
     measureData.push_back(millis());
     Serial.print(millis());
     Serial.print(", ");
