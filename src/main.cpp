@@ -10,12 +10,11 @@
 #include "Servo/servo.h"
 #include "camera_server/camera_server.h"
 
-#define tact 1 // D0
 #define SD_CS 21
-#define BME_CS 3
+#define tact 3
 
 unsigned long lastTime = 0;
-unsigned long ws_lastTime = 0;
+unsigned long ws_lastTime = 0; 
 
 float altitude = BME::altitude;
 float latitude = GPS::latitude;
@@ -123,14 +122,12 @@ void setup() {
   // put your setup code here, to run once:
   //ピン設定
   pinMode(SD_CS, OUTPUT);
-  pinMode(BME_CS, OUTPUT);
   pinMode(tact, INPUT_PULLUP);
 
   
 SPI.begin();
   //SPI衝突回避用
   digitalWrite(SD_CS, HIGH);
-  digitalWrite(BME_CS, HIGH);
 
 
 
