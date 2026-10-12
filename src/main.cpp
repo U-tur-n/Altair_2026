@@ -7,24 +7,29 @@
 #include "BME/BME.h"
 #include "BNO/BNO.h"
 #include "GPS/GPS.h"
+#include "Servo/servo.h"
 #include "camera_server/camera_server.h"
 
-#define tact 1 // D0
 #define SD_CS 21
-#define BME_CS 3
+#define tact 3
 
 unsigned long lastTime = 0;
+unsigned long ws_lastTime = 0; 
 
 float altitude = BME::altitude;
 float latitude = GPS::latitude;
 float longitude = GPS::longitude;
+float x_dist = GPS::x_dist;
+float y_dist = GPS::y_dist;
+float dist = GPS::dist;
 float ax;
 float ay;
 float az;
 float q;
 
 bool isRemoteSdActive = false; //記録開始用フラグ
-// bool isRemotePwrActive = false;//電装動作用フラグ
+bool isRemotePwrActive = false;//電装動作用フラグ
+bool lastRemotePwrActive = false;
 
 bool last_camera_in_use = false;
 
@@ -61,18 +66,26 @@ AwsFrameInfo *info = (AwsFrameInfo*)arg;
     Serial.println(message);
 
     // --- メッセージの内容に応じて変数を変更 ---
-    if (message == "CMD_SD" ) { //|| isRemoteSdActive==true
+if (message == "CMD_SD" ) { //|| isRemoteSdActive==true
+      unsigned long CMD_SDlasttime;
+    if (millis() - CMD_SDlasttime > 1000){
       isRemoteSdActive = !isRemoteSdActive; // true/falseを反転
       Serial.print("SD記録フラグが変更されました: ");
       Serial.println(isRemoteSdActive ? "ON" : "OFF");
-      
+      CMD_SDlasttime = millis();
+
       // ここにSD記録開始の処理や save() 関数を呼び出す処理を書くことができます
+    }
     } 
-    // else if (message == "CMD_PWR") {
-    //   isRemotePwrActive = !isRemotePwrActive;
-    //   Serial.print("電装動作フラグが変更されました: ");
-    //   Serial.println(isRemotePwrActive ? "ON" : "OFF");
-    // }
+    else if (message == "CMD_PWR") {
+      unsigned long CMD_PWRlasttime;
+      if (millis() - CMD_PWRlasttime > 1000) {
+      isRemotePwrActive = true;
+      Serial.print("電装動作フラグが変更されました: ");
+      Serial.println(isRemotePwrActive ? "ON" : "OFF");
+        CMD_PWRlasttime = millis();
+      }
+    }
 
     
   }
@@ -101,6 +114,7 @@ void initWebSocket() {
   server.addHandler(&ws);
 }
 
+
 // put function declarations here:
 void save(bool);
 
@@ -108,16 +122,14 @@ void setup() {
   // put your setup code here, to run once:
   //ピン設定
   pinMode(SD_CS, OUTPUT);
-  pinMode(BME_CS, OUTPUT);
   pinMode(tact, INPUT_PULLUP);
 
   
 SPI.begin();
   //SPI衝突回避用
   digitalWrite(SD_CS, HIGH);
-  digitalWrite(BME_CS, HIGH);
 
-  
+
 
   Serial.begin(115200);
   // while(!Serial);
@@ -162,12 +174,7 @@ server.serveStatic("/", LittleFS, "/")
   //SD初期化 
   Serial.print("Initializing SD card...");
   sendStatusMessage("Initializing SD card...");
-    if (SD.begin(SD_CS) == false) {
-    Serial.println("SD card or file not present");
-    sendStatusMessage("SD card or file not present");
-    while (1)
-      ;
-    }
+
     
   Serial.println("OK");
     sendStatusMessage("OK");
@@ -183,25 +190,27 @@ server.serveStatic("/", LittleFS, "/")
     sendStatusMessage("BME280 initialized successfully.");
   } else {
     sendStatusMessage("BME280 initialization failed.");
-    while (1)
-      ;
+    // while (1)
+    //   ;
   }
   delay(100);
   if(BNO::BNObegin()){
     sendStatusMessage("BNO055 initialized successfully.");
   } else {
     sendStatusMessage("BNO055 initialization failed.");
-    while (1)
-      ;
+    // while (1)
+    //   ;
   }
   delay(100);
   if(GPS::GPSbegin()){
     sendStatusMessage("GPS initialized successfully.");
   } else {
     sendStatusMessage("GPS initialization failed.");
-    while (1)
-      ;
+    // while (1)
+    //   ;
   }
+  delay(100);
+  servo::begin();
   delay(100);
   //ボーレートを115200
 
@@ -212,13 +221,10 @@ server.serveStatic("/", LittleFS, "/")
   if (fp == false) {
     Serial.println("cannot open the file");
     sendStatusMessage("cannot open the file");
-    while (1)
-      ;
   }
   Serial.println("OK");
   sendStatusMessage("OK");
 
-  fp.println("time, altitude, latitude, longitude, ax, ay, az, q");
   Serial.println("press the tact switch...");
   sendStatusMessage("press the button...");
   while(digitalRead(tact) == HIGH && isRemoteSdActive == false) {
@@ -237,13 +243,18 @@ server.serveStatic("/", LittleFS, "/")
   while(digitalRead(tact) == LOW)
   ;
   isRemoteSdActive = true; // リモートSD記録フラグを強制的にtrueに設定
+        String jsonString = "{";
+    jsonString += "\"sd_active\":" + String(isRemoteSdActive ? "true" : "false") + ",";
+    jsonString += "\"cam_active\":" + String(camera_in_use ? "true" : "false");
+    jsonString += "}";
+    ws.textAll(jsonString);
   sendStatusMessage("start");
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   ws.cleanupClients();
-  if(millis() - lastTime >= 200){
+  if(millis() - lastTime >= 50){
     measureData.push_back(millis());
     Serial.print(millis());
     Serial.print(", ");
@@ -254,18 +265,26 @@ void loop() {
     altitude = BME::altitude;
     latitude = GPS::latitude;
     longitude = GPS::longitude;
+    x_dist = GPS::x_dist;
+    y_dist = GPS::y_dist;
+    dist = GPS::dist;
     ax = BNO::ax;
     ay = BNO::ay;
     az = BNO::az;
-    // q = BNO::q;
+    q = BNO::q;
 
+    float ln;
     measureData.push_back(altitude);
     measureData.push_back(latitude);
     measureData.push_back(longitude);
+    measureData.push_back(x_dist);
+    measureData.push_back(y_dist);
+    measureData.push_back(dist);
     measureData.push_back(ax);
     measureData.push_back(ay); 
     measureData.push_back(az);
-    // measureData.push_back(q);
+    measureData.push_back(q);
+    measureData.push_back(9999); //この値を受け取ったらcsvで改行
 
     Serial.print(altitude);
     Serial.print(", ");
@@ -273,30 +292,45 @@ void loop() {
     Serial.print(", ");
     Serial.print(longitude);
     Serial.print(", ");
+    Serial.print(x_dist);
+    Serial.print(", ");
+    Serial.print(y_dist);
+    Serial.print(", ");
+    Serial.print(dist);
+    Serial.print(",");
     Serial.print(ax);
     Serial.print(", ");
     Serial.print(ay);
     Serial.print(", ");
     Serial.println(az);
-    // Serial.print(", ");
-    // Serial.println(q);
+    Serial.print(", ");
+    Serial.println(q);
 
     // すでに取得済みの変数を元に、JSONフォーマットの文字列を生成
     // (ArduinoJsonライブラリを使用しても良いですが、軽量化のため文字列結合で生成しています)
+    if (millis() - ws_lastTime >= 350) { // 0.35秒ごとにWebSocketで送信
+      ws_lastTime = millis();
     String jsonString = "{";
-    jsonString += "\"ax\":" + String(ax, 2) + ",";
-    jsonString += "\"ay\":" + String(ay, 2) + ",";
-    jsonString += "\"az\":" + String(az, 2) + ",";
-    jsonString += "\"latitude\":" + String(latitude, 6) + ",";
-    jsonString += "\"longitude\":" + String(longitude, 6) + ",";
-    jsonString += "\"altitude\":" + String(altitude, 1) + ",";
+    jsonString += "\"ax\":\"" + String(ax, 2) + "\",";
+    jsonString += "\"ay\":\"" + String(ay, 2) + "\",";
+    jsonString += "\"az\":\"" + String(az, 2) + "\",";
+    jsonString += "\"q\":\"" + String(q, 2) + "\",";
+    jsonString += "\"latitude\":\"" + String(latitude, 6) + "\",";
+    jsonString += "\"longitude\":\"" + String(longitude, 6) + "\",";
+    jsonString += "\"x_dist\":\"" + String(x_dist, 1) + "\",";
+    jsonString += "\"y_dist\":\"" + String(y_dist, 1) + "\",";
+    jsonString += "\"dist\":\"" + String(dist, 1) + "\",";
+    jsonString += "\"altitude\":\"" + String(altitude, 1) + "\",";
     jsonString += "\"sd_active\":" + String(isRemoteSdActive ? "true" : "false") + ",";
-    jsonString += "\"cam_active\":" + String(camera_in_use ? "true" : "false");
+    jsonString += "\"cam_active\":" + String(camera_in_use ? "true" : "false") + ",";
+    jsonString += "\"pwr_active\":" + String(isRemotePwrActive ? "true" : "false");
     // jsonString += "\"msg\":\"Data updated at " + String(currentMillis / 1000) + "s\"";
     jsonString += "}";
 
     // 接続されているすべてのブラウザへデータを送信
     ws.textAll(jsonString);
+    ws_lastTime = millis();
+    }
 
     if(camera_in_use != last_camera_in_use){
       sendStatusMessage(camera_in_use ? "Camera is active" : "Camera is inactive");
@@ -307,15 +341,30 @@ void loop() {
       Serial.println("stop");
       sendStatusMessage("stop");
       
+    
   while(digitalRead(tact) == LOW)
   ;
       save(true);
     }
+
     if(measureData.size() >= 2100){
       save(false);
     }
+    
   lastTime = millis();
   }
+
+  if (isRemoteSdActive) {
+  }
+
+  if (isRemotePwrActive != lastRemotePwrActive) {
+    servo::execute();
+    Serial.println("Servo is operating");
+    sendStatusMessage("Servo is operating");
+    lastRemotePwrActive = isRemotePwrActive;
+  }
+
+  // リモートSD記録がONの場合、指定間隔でタイムラプスを保存
 }
 
 // put function definitions here:
@@ -324,13 +373,6 @@ void save(bool end) {
   digitalWrite(SD_CS, LOW);
     for (double data : measureData)
     {
-      fp.print(data);
-      i++;
-      if (i % 7 == 0) { // 7個のデータごとに改行
-        fp.println();
-      } else {
-        fp.print(",");
-      }
       // fp.print(",");
       // fp.println(data); // q
       // Serial.println("receive any key...");
@@ -340,13 +382,11 @@ void save(bool end) {
       // }
     }
   if (end == false) { // データ保存のみ
-    fp.flush();
     Serial.println("saved data");
     sendStatusMessage("saved data");
     measureData.clear();
     digitalWrite(SD_CS, HIGH);
   } else {
-    fp.close(); // ファイルを閉じる(スイッチが押された場合)
     isRemoteSdActive = false; // 記録フラグをfalseに戻す
     Serial.println("saved data and closed file");
     sendStatusMessage("saved data and closed file");
@@ -374,6 +414,11 @@ void save(bool end) {
   while(digitalRead(tact) == LOW)
   ;
   isRemoteSdActive = true; // リモートSD記録フラグを強制的にtrueに設定
+        String jsonString = "{";
+    jsonString += "\"sd_active\":" + String(isRemoteSdActive ? "true" : "false") + ",";
+    jsonString += "\"cam_active\":" + String(camera_in_use ? "true" : "false");
+    jsonString += "}";
+    ws.textAll(jsonString);
   sendStatusMessage("start");
 }
 }

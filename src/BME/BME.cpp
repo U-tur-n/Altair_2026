@@ -9,7 +9,6 @@
 #define BME_SCLK  D8
 #define BME_MISO  D9
 #define BME_MOSI D10
-#define cs 3 //D2
 
 
 // 同一SPIバス上のMicroSDスロットのCSピン（衝突防止用）
@@ -57,7 +56,6 @@ delay(1000); // シリアルモニタが開くまで待機
   Serial.println(" hPa (この地点を高度 0m とします)");
   Serial.println("---------------------------------------");
 
-  digitalWrite(cs, HIGH); // BME280のCSピンをHIGHにしてSPIバスを解放
 
   bool result = true; // 初期化成功
   return result;
@@ -66,11 +64,9 @@ delay(1000); // シリアルモニタが開くまで待機
 void execute() {
   // --- 仕様書で定義された変数名 ---
   
-  digitalWrite(cs, LOW); // BME280のCSピンをLOWにして通信開始
   // float pressure = bme.readPressure() / 100.0F;     // 気圧 [hPa]
   altitude = bme.readAltitude(launchPressure); // 高度 [m] (打ち上げ地点を0mとして算出)
   float temperature = bme.readTemperature();         // 温度 [°C] (気圧センサ内蔵)
-  digitalWrite(cs, HIGH); // BME280のCSピンをHIGHにして通信終了
 }
 
 }
