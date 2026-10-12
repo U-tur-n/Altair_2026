@@ -8,7 +8,7 @@ namespace servo{
    pinMode(servoPin, OUTPUT);
    // Serial.begin(9600);
    // 終点位置(501)から90度の位置(約1450)まで回転
-       for (DutyCycle = 1500; DutyCycle > 500; DutyCycle += -1) {
+       for (DutyCycle = 1500; DutyCycle > 500; DutyCycle += -100) {
           digitalWrite(servoPin, HIGH);
           delayMicroseconds(DutyCycle);
           digitalWrite(servoPin, LOW);
