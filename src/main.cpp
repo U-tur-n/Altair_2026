@@ -347,7 +347,7 @@ void loop() {
       save(true);
     }
 
-    if(measureData.size() >= 2100){
+    if(measureData.size() >= 5000){
       save(false);
     }
     
