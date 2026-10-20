@@ -286,25 +286,25 @@ void loop() {
     measureData.push_back(q);
     measureData.push_back(9999); //この値を受け取ったらcsvで改行
 
-    Serial.print(altitude);
+    Serial.print(altitude, 2);
     Serial.print(", ");
-    Serial.print(latitude);
+    Serial.print(latitude, 6);
     Serial.print(", ");
-    Serial.print(longitude);
+    Serial.print(longitude, 6);
     Serial.print(", ");
-    Serial.print(x_dist);
+    Serial.print(x_dist, 1);
     Serial.print(", ");
-    Serial.print(y_dist);
+    Serial.print(y_dist, 1);
     Serial.print(", ");
-    Serial.print(dist);
+    Serial.print(dist, 1);
     Serial.print(",");
-    Serial.print(ax);
+    Serial.print(ax, 2);
     Serial.print(", ");
-    Serial.print(ay);
+    Serial.print(ay, 2);
     Serial.print(", ");
-    Serial.println(az);
+    Serial.println(az, 2);
     Serial.print(", ");
-    Serial.println(q);
+    Serial.println(q, 2);
 
     // すでに取得済みの変数を元に、JSONフォーマットの文字列を生成
     // (ArduinoJsonライブラリを使用しても良いですが、軽量化のため文字列結合で生成しています)
