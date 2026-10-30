@@ -1,0 +1,172 @@
+body {
+    font-family: "Meiryo", "Segoe UI", sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: center;
+}
+
+.dashboard {
+    width: 1000px;
+    border: 1px solid #d3d3d3;
+    padding: 15px 20px 20px 20px;
+    display: flex;
+    gap: 40px;
+    box-sizing: border-box;
+}
+
+/* ... (以降、前回のCSSの中身をすべて貼り付けます) ... */
+body {
+    font-family: "Meiryo", "Segoe UI", sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: center;
+}
+
+.dashboard {
+    width: 1000px;
+    border: 1px solid #d3d3d3; /* 外枠の薄いグレー線 */
+    padding: 15px 20px 20px 20px;
+    display: flex;
+    gap: 40px;
+    box-sizing: border-box;
+}
+
+/* 左側の列（センサー値・カメラ） */
+.col-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.section-label {
+    font-size: 16px;
+    margin: 5px 0 2px 0;
+}
+
+.data-panel {
+    border: 2px solid #000;
+    display: flex;
+    align-items: center;
+    height: 50px;
+    margin-bottom: 10px;
+}
+
+.data-panel > div {
+    flex: 1;
+    font-size: 24px;
+    padding-left: 10px;
+    font-family: "Courier New", monospace, sans-serif;
+}
+
+.video-feed {
+background-color: #333; /* 読み込み前の背景色（黒寄り） */
+    width: 100%;
+    aspect-ratio: 4 / 3;    /* アスペクト比を4:3に固定 */
+    height: auto;           /* 高さを自動計算に変更 */
+    margin-top: 5px;
+    object-fit: cover;      /* 枠に合わせてトリミングしつつアスペクト比を維持 */
+    display: block;
+}
+
+/* 右側の列（ボタン・ステータス） */
+.col-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.button-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    margin-top: 25px;
+    margin-bottom: 30px;
+}
+
+.btn {
+    width: 180px;
+    height: 100px;
+    border: 2px solid #000;
+    border-radius: 15px;
+    font-size: 32px;
+    font-weight: bold;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.btn-sd {
+    background-color: #a4c2f4;
+    color: #000;
+}
+
+.btn-pwr {
+    background-color: #ff0000;
+    color: #fff;
+}
+
+.status-area {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: flex-end;
+}
+
+.status-label {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.status-box {
+    border: 2px solid #000;
+    height: 130px;
+    width: 100%;
+    margin-bottom: 10px;
+    overflow-y: auto;       /* 縦スクロールを有効にする */
+    white-space: pre-wrap;  /* 改行コードを有効にし、枠端で自動折り返し */
+    word-break: break-all;  /* 長い英数字でも枠に合わせて強制折り返し */
+}
+
+
+.footer-text {
+    text-align: right;
+    font-size: 18px;
+    font-weight: bold;
+}
+/* フライト再生用。既存の配色・左右配置を引き継ぎます。 */
+.col-left, .col-right { min-width: 0; }
+.col-left .data-panel > div { min-width: 0; padding-left: 8px; font-size: 20px; font-variant-numeric: tabular-nums; }
+.col-left .distance-panel { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); height: 65px; }
+.col-left .distance-panel > div { font-size: 18px; }
+.replay-label { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+.replay-label small { color: #aebbd9; font-size: 11px; }
+#replay-time { font-family: monospace; font-size: 13px; white-space: nowrap; }
+.video-container { position: relative; margin-top: 5px; width: 100%; aspect-ratio: 4 / 3; background: #000; border-radius: 6px; overflow: hidden; }
+.video-container .video-feed { margin: 0; width: 100%; height: 100% !important; object-fit: contain; background: #000; }
+.video-notice { position: absolute; inset: 0; padding: 20px; background: #080e23; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; font-size: 14px; line-height: 1.7; }
+.video-notice p { margin: 0; overflow-wrap: anywhere; }
+[hidden] { display: none !important; }
+.file-picker, #retry-play { background: #a4c2f4; color: #06132e; border: 0; border-radius: 6px; padding: 9px 14px; font: inherit; cursor: pointer; }
+.file-picker input { display: block; width: 100%; max-width: 250px; margin-top: 8px; font-size: 12px; }
+.replay-meta { font-size: 13px; line-height: 1.6; color: #aebbd9; margin: 4px 0 10px; }
+.btn-sd { background: #ffd700; }
+.btn:disabled { cursor: default; opacity: 0.65; box-shadow: none; }
+.btn:focus-visible, .file-picker:focus-within, #retry-play:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+#ws-status { color: #a4c2f4; }
+@media (max-width: 768px) {
+  .dashboard { max-width: 100%; box-sizing: border-box; }
+  .col-left .data-panel > div { font-size: clamp(13px, 4vw, 20px); }
+  .col-left .distance-panel > div { font-size: 17px; }
+  .replay-label { flex-wrap: wrap; }
+  .button-area .btn { font-size: clamp(21px, 5vw, 30px); min-width: 0; }
+}
