@@ -4,6 +4,14 @@
 window.FLIGHT_REPLAY_CONFIG = {
   videoSrc: "media/flight.mp4",
   loop: true,
+  telemetryInterval: 0.5, // 動画時刻で0.5秒ごとに数値を更新（映像は通常どおり再生）
+  // 静止中も残る計測ノイズの振幅。すべて演出用の仮値。
+  sensorNoise: {
+    acceleration: 0.06, // m/s²
+    euler: 0.15,        // deg
+    position: 0.03,    // m（x_dist / y_dist）
+    altitude: 0.08,    // m（地上でも0を中心に微小に揺らぐ）
+  },
   profileConfirmed: true, // 映像に合わせた演出。実測値であることを意味しません。
   timeline: {
     launch: 3.0,

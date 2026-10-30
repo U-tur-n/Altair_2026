@@ -3,15 +3,20 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const path = require('node:path');
-const { sample, validate } = require('../telemetry.js');
+const { sample, validate, sampleTime } = require('../telemetry.js');
 const context = { window: {} };
 vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../replay-config.js'), 'utf8'), context);
 const config = context.window.FLIGHT_REPLAY_CONFIG;
+const noiseless = { ...config, sensorNoise: { acceleration: 0, euler: 0, position: 0, altitude: 0 } };
 
 test('video timeline is valid and invalid ordering is rejected', () => {
   validate(config);
   assert.throws(() => validate({ ...config, timeline: { ...config.timeline, landing: 0 } }));
   assert.throws(() => validate({ ...config, attitude: [[0, 0, 0, 0], [0, 0, 0, 0]] }));
+  for (const telemetryInterval of [0, -1, NaN, Infinity]) {
+    assert.throws(() => validate({ ...config, telemetryInterval }));
+  }
+  assert.throws(() => validate({ ...config, sensorNoise: { euler: -0.1 } }));
 });
 
 test('all video frames have finite telemetry and normalized angles', () => {
@@ -21,7 +26,7 @@ test('all video frames have finite telemetry and normalized angles', () => {
       if (key !== 'phase') assert.ok(Number.isFinite(value), `${key} at ${t}`);
     }
     for (const key of ['ox', 'oy', 'oz']) assert.ok(data[key] >= -180 && data[key] < 180);
-    assert.ok(data.alt >= 0 && data.alt <= config.maxAltitude);
+    assert.ok(data.alt >= -config.sensorNoise.altitude && data.alt <= config.maxAltitude + config.sensorNoise.altitude);
     assert.ok(Math.abs(data.dist - Math.hypot(data.x_dist, data.y_dist)) < 1e-9);
   }
 });
@@ -39,8 +44,38 @@ test('video events drive launch, attitude change, and landing', () => {
   assert.equal(sample(14.5, config).phase, 'パラシュート降下');
   assert.ok(Math.abs(sample(15.2, config).ox) > 150);
   assert.equal(sample(24, config).phase, '着地');
-  assert.equal(sample(config.timeline.apogee, config).alt, config.maxAltitude);
-  assert.equal(sample(35, config).alt, 0);
-  const rest = sample(35, config);
+  assert.equal(sample(config.timeline.apogee, noiseless).alt, config.maxAltitude);
+  assert.equal(sample(35, noiseless).alt, 0);
+  const rest = sample(35, noiseless);
   assert.ok(Math.abs(Math.hypot(rest.ax, rest.ay, rest.az) - 9.80665) < 1e-6);
+});
+
+test('every displayed sensor value fluctuates before launch and after landing', () => {
+  for (const start of [0, 27]) {
+    const readings = Array.from({ length: 6 }, (_, i) => sample(start + i * 0.5, config));
+    for (const key of ['ax', 'ay', 'az', 'ox', 'oy', 'oz', 'x_dist', 'y_dist', 'dist', 'alt']) {
+      assert.ok(new Set(readings.map(row => row[key].toFixed(2))).size > 1, `${key} must fluctuate at ${start}s`);
+    }
+    for (let i = 0; i < readings.length; i++) {
+      const baseline = sample(start + i * 0.5, noiseless);
+      for (const [key, group] of Object.entries({ ax: 'acceleration', ay: 'acceleration', az: 'acceleration',
+        ox: 'euler', oy: 'euler', oz: 'euler', x_dist: 'position', y_dist: 'position', alt: 'altitude' })) {
+        assert.ok(Math.abs(readings[i][key] - baseline[key]) <= config.sensorNoise[group] + 1e-9, `${key} noise exceeds amplitude`);
+      }
+    }
+  }
+});
+
+test('values are sampled at half-second video timestamps, including backward seeks', () => {
+  for (const [t, expected] of [[0, 0], [0.1, 0], [0.49, 0], [0.5, 0.5], [0.9, 0.5],
+    [26.6, 26.5], [26.99, 26.5], [27, 27], [1.1, 1], [0, 0]]) {
+    assert.equal(sampleTime(t, config), expected);
+  }
+  assert.equal(sampleTime(3.5, { ...config, telemetryInterval: 1 }), 3);
+  assert.deepEqual(sample(sampleTime(27.1, config), config), sample(sampleTime(27.4, config), config));
+  assert.notDeepEqual(sample(sampleTime(27.49, config), config), sample(sampleTime(27.5, config), config));
+  const saved = sample(sampleTime(27.5, config), config);
+  sample(sampleTime(35.1, config), config);
+  sample(sampleTime(0.2, config), config);
+  assert.deepEqual(sample(sampleTime(27.5, config), config), saved);
 });

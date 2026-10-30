@@ -9,6 +9,23 @@
   const smooth = (u) => { u = clamp(u, 0, 1); return u * u * (3 - 2 * u); };
   const wrap = (angle) => ((angle + 180) % 360 + 360) % 360 - 180;
   const vibration = (t, scale) => scale * (0.65 * Math.sin(t * 37.7) + 0.35 * Math.sin(t * 61.3));
+  const defaultNoise = { acceleration: 0.06, euler: 0.15, position: 0.03, altitude: 0.08 };
+
+  function sampleTime(seconds, config) {
+    const t = Number.isFinite(seconds) ? Math.max(0, seconds) : 0;
+    const interval = config.telemetryInterval ?? 0.5;
+    return Math.floor(t / interval + 1e-9) * interval;
+  }
+
+  // 各軸・各サンプルで異なる擬似乱数。時刻から決まるのでシークしても同じ値に戻る。
+  function noise(seconds, channel, config) {
+    const tick = Math.floor(seconds / (config.telemetryInterval ?? 0.5) + 1e-9);
+    let value = Math.imul(tick + 1, 0x9e3779b1) ^ Math.imul(channel, 0x85ebca6b);
+    value = Math.imul(value ^ (value >>> 16), 0x7feb352d);
+    value = Math.imul(value ^ (value >>> 15), 0x846ca68b);
+    value ^= value >>> 16;
+    return (value >>> 0) / 0xffffffff * 2 - 1;
+  }
 
   function validate(config) {
     const keys = ["launch", "burnout", "apogee", "parachute", "landing"];
@@ -25,6 +42,13 @@
     }
     if (config.maxAltitude <= 0) throw new Error("maxAltitude は正の数値にしてください。");
     if (typeof config.videoSrc !== "string" || !config.videoSrc.trim()) throw new Error("videoSrc に動画のパスを指定してください。");
+    if (!Number.isFinite(config.telemetryInterval ?? 0.5) || (config.telemetryInterval ?? 0.5) <= 0) {
+      throw new Error("telemetryInterval は正の秒数にしてください。");
+    }
+    for (const [key, fallback] of Object.entries(defaultNoise)) {
+      const amplitude = config.sensorNoise?.[key] ?? fallback;
+      if (!Number.isFinite(amplitude) || amplitude < 0) throw new Error(`sensorNoise.${key} は0以上の有限の数値にしてください。`);
+    }
     if (config.attitude !== undefined) {
       if (!Array.isArray(config.attitude) || config.attitude.length < 2) throw new Error("attitude には2点以上の姿勢データが必要です。");
       let last = -1;
@@ -57,7 +81,7 @@
     let phase, ax = 0, ay = 0, az = 9.80665, ox = 0, oy = 0, oz = 0;
     const flight = clamp((t - launch) / (landing - launch), 0, 1);
     // 上昇・降下を連続した曲線で作成。高度や位置も説明用のダミーです。
-    const alt = t < apogee
+    let alt = t < apogee
       ? config.maxAltitude * Math.sin(clamp((t - launch) / (apogee - launch), 0, 1) * Math.PI / 2) ** 2
       : config.maxAltitude * (1 - smooth((t - apogee) / (landing - apogee)));
     if (t < launch) {
@@ -102,12 +126,20 @@
       ay = 9.80665 * Math.sin(r) * Math.cos(p) - 3 * shock;
       az = 9.80665 * Math.cos(r) * Math.cos(p) + 28 * shock;
     }
-    const x_dist = config.driftX * smooth(flight);
-    const y_dist = config.driftY * smooth(flight);
+    const amplitude = (key) => config.sensorNoise?.[key] ?? defaultNoise[key];
+    ax += noise(t, 1, config) * amplitude("acceleration");
+    ay += noise(t, 2, config) * amplitude("acceleration");
+    az += noise(t, 3, config) * amplitude("acceleration");
+    ox += noise(t, 4, config) * amplitude("euler");
+    oy += noise(t, 5, config) * amplitude("euler");
+    oz += noise(t, 6, config) * amplitude("euler");
+    const x_dist = config.driftX * smooth(flight) + noise(t, 7, config) * amplitude("position");
+    const y_dist = config.driftY * smooth(flight) + noise(t, 8, config) * amplitude("position");
+    alt += noise(t, 9, config) * amplitude("altitude");
     return { ax, ay, az, ox: wrap(ox), oy: wrap(oy), oz: wrap(oz), x_dist, y_dist,
       dist: Math.hypot(x_dist, y_dist), alt, phase };
   }
-  const api = { validate, sample };
+  const api = { validate, sample, sampleTime };
   if (typeof module === "object" && module.exports) module.exports = api;
   else root.FlightTelemetry = api;
 })(typeof globalThis !== "undefined" ? globalThis : this);

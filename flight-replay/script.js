@@ -11,6 +11,7 @@
   let previousPhase = "";
   let previousTime = -1;
   let lastDraw = -Infinity;
+  let lastTelemetryTime = null;
   let config;
   const logLines = [];
 
@@ -34,6 +35,7 @@
     notice.hidden = false;
   }
   function clearTelemetry() {
+    lastTelemetryTime = null;
     for (const field of fields) $(field).textContent = "-";
     $("replay-time").textContent = "00:00.00";
     $("flight-phase").textContent = "映像待ち";
@@ -41,16 +43,21 @@
   function render() {
     if (video.readyState < 1 || video.error) return;
     const t = video.currentTime;
-    const sample = FlightTelemetry.sample(t, config);
-    for (const field of fields) {
-      const value = Math.abs(sample[field]) < 0.005 ? 0 : sample[field];
-      $(field).textContent = value.toFixed(2);
-    }
     $("replay-time").textContent = formatTime(t);
-    $("flight-phase").textContent = sample.phase;
     if (t < previousTime - 0.2) log("巻き戻し・リピート：映像時刻から再計算");
-    if (sample.phase !== previousPhase) log(sample.phase);
-    previousPhase = sample.phase;
+    // 同じ0.5秒区間は値を保持。pause/timeupdate等の追加イベントでも更新しない。
+    const telemetryTime = FlightTelemetry.sampleTime(t, config);
+    if (telemetryTime !== lastTelemetryTime) {
+      const sample = FlightTelemetry.sample(telemetryTime, config);
+      for (const field of fields) {
+        const value = Math.abs(sample[field]) < 0.005 ? 0 : sample[field];
+        $(field).textContent = value.toFixed(2);
+      }
+      $("flight-phase").textContent = sample.phase;
+      if (sample.phase !== previousPhase) log(sample.phase);
+      previousPhase = sample.phase;
+      lastTelemetryTime = telemetryTime;
+    }
     previousTime = t;
   }
   async function playAutomatically() {
