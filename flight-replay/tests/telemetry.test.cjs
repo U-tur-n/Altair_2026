@@ -7,7 +7,7 @@ const { sample, validate, sampleTime } = require('../telemetry.js');
 const context = { window: {} };
 vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../replay-config.js'), 'utf8'), context);
 const config = context.window.FLIGHT_REPLAY_CONFIG;
-const noiseless = { ...config, sensorNoise: { acceleration: 0, euler: 0, position: 0, altitude: 0 } };
+const noiseless = { ...config, sensorNoise: { acceleration: 0, euler: 0 } };
 
 test('video timeline is valid and invalid ordering is rejected', () => {
   validate(config);
@@ -26,8 +26,6 @@ test('all video frames have finite telemetry and normalized angles', () => {
       if (key !== 'phase') assert.ok(Number.isFinite(value), `${key} at ${t}`);
     }
     for (const key of ['ox', 'oy', 'oz']) assert.ok(data[key] >= -180 && data[key] < 180);
-    assert.ok(data.alt >= -config.sensorNoise.altitude && data.alt <= config.maxAltitude + config.sensorNoise.altitude);
-    assert.ok(Math.abs(data.dist - Math.hypot(data.x_dist, data.y_dist)) < 1e-9);
   }
 });
 
@@ -44,8 +42,6 @@ test('video events drive launch, attitude change, and landing', () => {
   assert.equal(sample(14.5, config).phase, 'パラシュート降下');
   assert.ok(Math.abs(sample(15.2, config).ox) > 150);
   assert.equal(sample(24, config).phase, '着地');
-  assert.equal(sample(config.timeline.apogee, noiseless).alt, config.maxAltitude);
-  assert.equal(sample(35, noiseless).alt, 0);
   const rest = sample(35, noiseless);
   assert.ok(Math.abs(Math.hypot(rest.ax, rest.ay, rest.az) - 9.80665) < 1e-6);
 });
@@ -53,17 +49,21 @@ test('video events drive launch, attitude change, and landing', () => {
 test('every displayed sensor value fluctuates before launch and after landing', () => {
   for (const start of [0, 27]) {
     const readings = Array.from({ length: 6 }, (_, i) => sample(start + i * 0.5, config));
-    for (const key of ['ax', 'ay', 'az', 'ox', 'oy', 'oz', 'x_dist', 'y_dist', 'dist', 'alt']) {
+    for (const key of ['ax', 'ay', 'az', 'ox', 'oy', 'oz']) {
       assert.ok(new Set(readings.map(row => row[key].toFixed(2))).size > 1, `${key} must fluctuate at ${start}s`);
     }
     for (let i = 0; i < readings.length; i++) {
       const baseline = sample(start + i * 0.5, noiseless);
       for (const [key, group] of Object.entries({ ax: 'acceleration', ay: 'acceleration', az: 'acceleration',
-        ox: 'euler', oy: 'euler', oz: 'euler', x_dist: 'position', y_dist: 'position', alt: 'altitude' })) {
+        ox: 'euler', oy: 'euler', oz: 'euler' })) {
         assert.ok(Math.abs(readings[i][key] - baseline[key]) <= config.sensorNoise[group] + 1e-9, `${key} noise exceeds amplitude`);
       }
     }
   }
+});
+
+test('only requested acceleration and Euler angle values are generated', () => {
+  assert.deepEqual(Object.keys(sample(10, config)).sort(), ['ax', 'ay', 'az', 'ox', 'oy', 'oz', 'phase'].sort());
 });
 
 test('values are sampled at half-second video timestamps, including backward seeks', () => {

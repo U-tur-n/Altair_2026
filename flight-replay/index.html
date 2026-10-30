@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Altair Flight Replay</title>
+    <title>Altir Remote Monitoring & Control System</title>
     <link rel="stylesheet" href="style.css">
-
+    
     <style>
         /* ベースレイアウトの柔軟化と背景色の変更 */
         body {
             background-color: #000000; /* 背景を黒に変更 */
-            padding: 15px;
+            padding: 15px; 
         }
-
+        
         .dashboard {
             width: 100% !important; /* style.cssの1000px固定を上書き */
             max-width: 1100px;
@@ -29,7 +29,7 @@
             position: absolute;
             top: 15px;
             right: 20px;
-            height: 90px;
+            height: 90px; 
             width: auto;
             object-fit: contain;
             z-index: 10; /* 他の要素より手前に表示 */
@@ -55,7 +55,7 @@
 
         /* 操作ボタンの位置 (margin-topで調整) */
         .button-area {
-            margin-top: 110px;
+            margin-top: 110px; 
         }
 
         /* ボタンの立体感と押し込みアクション (色は維持) */
@@ -65,7 +65,7 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
             transition: transform 0.1s, box-shadow 0.1s;
         }
-
+        
         .btn:active {
             transform: translateY(2px);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -104,7 +104,7 @@
 
             .dashboard {
                 /* 縮小・拡大の基準となる固定サイズ（デザインが崩れない理想のサイズ） */
-                width: 1100px !important;
+                width: 1100px !important; 
                 height: 750px !important; /* コンテンツが綺麗に収まる高さ */
                 flex-direction: row !important;
                 position: relative;
@@ -135,7 +135,7 @@
                 right: 0;
                 display: block;
                 margin: 0 auto 15px auto;
-                height: 70px;
+                height: 70px; 
             }
 
             .dashboard {
@@ -189,41 +189,32 @@
             </div>
 
             <div class="section-label">
-                <span style="margin-right: 15px;">距離・高度 [m]</span>
+                <span style="margin-right: 15px;">距離・高度 [m]
             </div>
-            <div class="data-panel distance-panel">
+            <div class="data-panel">
                 <div>x_dist : <span id="x_dist">-</span></div>
                 <div>y_dist : <span id="y_dist">-</span></div>
                 <div>dist : <span id="dist">-</span></div>
                 <div>高 : <span id="alt">-</span></div>
             </div>
 
-            <div class="section-label replay-label">
-                <span>飛行映像 <small>／ テレメトリはダミーデータ</small></span>
-                <span id="replay-time">00:00.00</span>
-            </div>
-            <div class="video-container">
-                <video id="camera-stream" class="video-feed" autoplay muted playsinline controls preload="auto" aria-label="飛行映像。テレメトリは映像の再生時刻に同期します。"></video>
-                <div id="video-notice" class="video-notice" role="status">
-                    <p id="video-notice-text">飛行映像を読み込んでいます…</p>
-                    <label class="file-picker">端末の飛行動画を選択<input id="video-file" type="file" accept="video/*"></label>
-                    <button id="retry-play" type="button" hidden>映像を再生</button>
-                </div>
-            </div>
+            <button id="btn-camera" class="btn" style="width: 100%; height: 45px; font-size: 16px; margin-bottom: 5px; background-color: #A4C2F4; border-radius: 8px; cursor: pointer;">
+                カメラ映像を取得 (1台のみ)
+            </button>
+            <video id="camera-stream" class="video-feed" autoplay muted loop playsinline preload="auto" style="object-fit: contain;"></video>
         </div>
 
         <div class="col-right">
             <div class="button-area">
-                <button type="button" class="btn btn-sd" aria-label="ＳＤ記録停止">ＳＤ記録<br>停止</button>
-                <button type="button" class="btn btn-pwr">電装動作</button>
+                <button class="btn btn-sd">SD記録<br>停止</button>
+                <button class="btn btn-pwr">電装動作</button>
             </div>
 
             <div class="status-area">
-                <div class="status-label">再生状態 : <span id="ws-status">準備中</span></div>
-                <div class="replay-meta"><span id="flight-phase">待機</span> · <span id="profile-note">仮の飛行タイミング</span></div>
+                <div class="status-label">接続状態 : <span id="ws-status" style="color: red;">切断</span></div>
                 <div class="status-label" style="margin-top: 15px;">ステータスメッセージ</div>
                 <div class="status-box" id="status-msg"></div>
-                <div class="footer-text" style="color: #8f9bb3; font-size: 14px; margin-top: 10px;">Altair Flight Replay · DEMO</div>
+                <div class="footer-text" style="color: #8f9bb3; font-size: 14px; margin-top: 10px;">Altair Remote Monitoring & Control System Ver. 1.2.9</div>
             </div>
         </div>
     </div>

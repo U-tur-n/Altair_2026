@@ -9,10 +9,7 @@ window.FLIGHT_REPLAY_CONFIG = {
   sensorNoise: {
     acceleration: 0.06, // m/s²
     euler: 0.15,        // deg
-    position: 0.03,    // m（x_dist / y_dist）
-    altitude: 0.08,    // m（地上でも0を中心に微小に揺らぐ）
   },
-  profileConfirmed: true, // 映像に合わせた演出。実測値であることを意味しません。
   timeline: {
     launch: 3.0,
     burnout: 4.3,
@@ -20,9 +17,6 @@ window.FLIGHT_REPLAY_CONFIG = {
     parachute: 14.4,
     landing: 23.8,
   },
-  maxAltitude: 180, // m（演出用の仮値）
-  driftX: 24,       // m
-  driftY: 12,       // m
   // [動画の秒数, roll(x), pitch(y), yaw(z)]。
   // カメラの取り付け方向を姿勢の基準に含めず、発射前を概ね0度とした相対姿勢。
   // 約14秒までは姿勢を保ち、以後の映像の回転・揺れと着地に合わせています。
