@@ -78,7 +78,7 @@ if (message == "CMD_SD" ) { //|| isRemoteSdActive==true
     }
     } 
     else if (message == "CMD_PWR") {
-      unsigned long CMD_PWRlasttime;
+      unsigned long CMD_PWRlasttime = 0;
       if (millis() - CMD_PWRlasttime > 1000) {
       isRemotePwrActive = true;
       Serial.print("電装動作フラグが変更されました: ");
