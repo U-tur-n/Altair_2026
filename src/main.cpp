@@ -357,12 +357,23 @@ void loop() {
   if (isRemoteSdActive) {
   }
 
-  if (isRemotePwrActive != lastRemotePwrActive) {
-    servo::execute();
-    Serial.println("Servo is operating");
-    sendStatusMessage("Servo is operating");
-    lastRemotePwrActive = isRemotePwrActive;
-  }
+if (isRemotePwrActive != lastRemotePwrActive) {
+  Serial.println("[SERVO] begin");
+
+  // バッテリー側の負荷を下げてから動作
+  WiFi.softAPdisconnect(true);
+  WiFi.mode(WIFI_OFF);
+  delay(100);
+
+  servo::execute();
+
+  lastRemotePwrActive = isRemotePwrActive;
+  Serial.println("[SERVO] end");
+
+  // アクセスポイントを復帰
+  WiFi.mode(WIFI_AP);
+  WiFi.softAP(ssid);
+}
 
   // リモートSD記録がONの場合、指定間隔でタイムラプスを保存
 }
