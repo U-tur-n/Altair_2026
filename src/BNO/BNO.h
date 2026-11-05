@@ -16,7 +16,7 @@ extern float z;
 extern float roll;
 extern float pitch;
 extern float yaw;
-void BNObegin();
+bool BNObegin();
 void execute();
 
 }
