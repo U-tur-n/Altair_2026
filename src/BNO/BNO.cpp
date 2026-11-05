@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include "BNO.h"
 
 namespace BNO {
