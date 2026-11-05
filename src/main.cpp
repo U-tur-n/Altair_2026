@@ -271,7 +271,10 @@ void loop() {
     ax = BNO::ax;
     ay = BNO::ay;
     az = BNO::az;
-    q = BNO::q;
+    w = BNO::w;
+    x = BNO::x;
+    y = BNO::y;
+    z = BNO::z;
 
     float ln;
     measureData.push_back(altitude);

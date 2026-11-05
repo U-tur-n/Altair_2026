@@ -6,7 +6,7 @@ namespace BNO {
 const uint8_t BNO_I2C_ADDR = 0x28; //0x29だとだめだった
 Adafruit_BNO055 bno = Adafruit_BNO055(-1, BNO_I2C_ADDR, &Wire);
 
-void begin(){
+void BNObegin(){
   Serial.begin(115200);
   delay(100); 
 

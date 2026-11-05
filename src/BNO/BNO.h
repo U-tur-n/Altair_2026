@@ -6,8 +6,14 @@
 #include <utility/imumaths.h>
 
 namespace BNO{
-
-  void begin();
-  void execute();
+extern float ax;
+extern float ay;
+extern float az;
+extern float w;
+extern float x;
+extern float y;
+extern float z;
+void BNObegin();
+void execute();
 
 }
