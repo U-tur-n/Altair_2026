@@ -38,7 +38,7 @@ void BNObegin(){
   Wire.beginTransmission(BNO_I2C_ADDR);
   Wire.write(0x08);           // ACC_CONFIG
   Wire.endTransmission(false); 
-  Wire.requestFrom(BNO_I2C_ADDR, (uint8_t)1,true);  
+  Wire.requestFrom((uint8_t)BNO_I2C_ADDR, (size_t)1, true);  
   if (Wire.available()) {
     byte regVal = Wire.read(); 
     

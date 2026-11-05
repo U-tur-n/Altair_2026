@@ -59,7 +59,7 @@ void setAccRange() {
   Wire.beginTransmission(deviceAddress);
   Wire.write(acc_configAddress);
   Wire.endTransmission(true);
-  Wire.requestFrom(deviceAddress, 1, true);
+  Wire.requestFrom((uint8_t)deviceAddress, (size_t)1, true);
   acc_configAddressData = Wire.read();
   Serial.println(acc_configAddressData, BIN);
   delay(25);
