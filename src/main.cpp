@@ -129,7 +129,7 @@ SPI.begin();
   //SPI衝突回避用
   digitalWrite(SD_CS, HIGH);
 
-
+  Wire.begin();
 
   Serial.begin(115200);
   // while(!Serial);
