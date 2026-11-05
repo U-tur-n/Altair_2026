@@ -226,6 +226,7 @@ server.serveStatic("/", LittleFS, "/")
     Serial.println("cannot open the file");
     sendStatusMessage("cannot open the file");
   }
+  fp.println("millis, altitude, latitude, longitude, x_dist, y_dist, dist, ax, ay, az, w, x, y, z");
   Serial.println("OK");
   sendStatusMessage("OK");
 
