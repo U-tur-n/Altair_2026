@@ -1,4 +1,4 @@
-#include "bno055_part2.h"
+#include "BNO.h"
 
 namespace BNO {
 
