@@ -13,13 +13,12 @@ float z = 0.0f;
 const uint8_t BNO_I2C_ADDR = 0x28; //0x29だとだめだった
 Adafruit_BNO055 bno = Adafruit_BNO055(-1, BNO_I2C_ADDR, &Wire);
 
-void BNObegin(){
+bool BNObegin(){
   Serial.begin(115200);
   delay(100); 
 
   if (!bno.begin()) {
-    Serial.println("no BNO055");
-    while (1);
+    return false;
   }
   //bno.setExtCrystalUse(true);
   Serial.println("BNO055 OK");
@@ -75,6 +74,8 @@ void BNObegin(){
   Wire.write(0x0C);           // NDOFモード
   Wire.endTransmission();
   delay(25); 
+
+  return true;
 }
 
 void execute(){
