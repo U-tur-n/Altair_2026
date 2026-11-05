@@ -174,8 +174,12 @@ server.serveStatic("/", LittleFS, "/")
   //SD初期化 
   Serial.print("Initializing SD card...");
   sendStatusMessage("Initializing SD card...");
-
-    
+  if (!SD.begin(SD_CS)) {
+    Serial.println("SD Card not found");
+    sendStatusMessage("SD Card not found");
+    while (1)
+      ;
+  }
   Serial.println("OK");
     sendStatusMessage("OK");
 
@@ -387,6 +391,12 @@ void save(bool end) {
   digitalWrite(SD_CS, LOW);
     for (double data : measureData)
     {
+      if (data == 9999) { // 改行のための特別な値
+        fp.println(); // 改行
+      } else {
+        fp.print(data);
+        fp.print(",");
+      }
       // fp.print(",");
       // fp.println(data); // q
       // Serial.println("receive any key...");
@@ -396,11 +406,13 @@ void save(bool end) {
       // }
     }
   if (end == false) { // データ保存のみ
+    fp.flush();
     Serial.println("saved data");
     sendStatusMessage("saved data");
     measureData.clear();
     digitalWrite(SD_CS, HIGH);
   } else {
+   fp.close();
     isRemoteSdActive = false; // 記録フラグをfalseに戻す
     Serial.println("saved data and closed file");
     sendStatusMessage("saved data and closed file");
