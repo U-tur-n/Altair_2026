@@ -9,6 +9,9 @@ float w = 0.0f;
 float x = 0.0f;
 float y = 0.0f;
 float z = 0.0f;
+float roll = 0.0f;
+float pitch = 0.0f;
+float yaw = 0.0f;
 
 const uint8_t BNO_I2C_ADDR = 0x28; //0x29だとだめだった
 Adafruit_BNO055 bno = Adafruit_BNO055(-1, BNO_I2C_ADDR, &Wire);
