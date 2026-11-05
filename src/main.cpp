@@ -25,7 +25,13 @@ float dist = GPS::dist;
 float ax;
 float ay;
 float az;
-float q;
+float w;
+float x;
+float y;
+float z;
+float roll;
+float pitch;
+float yaw;
 
 bool isRemoteSdActive = false; //記録開始用フラグ
 bool isRemotePwrActive = false;//電装動作用フラグ
@@ -226,7 +232,7 @@ server.serveStatic("/", LittleFS, "/")
     Serial.println("cannot open the file");
     sendStatusMessage("cannot open the file");
   }
-  fp.println("millis, altitude, latitude, longitude, x_dist, y_dist, dist, ax, ay, az, w, x, y, z");
+  fp.println("millis, altitude, latitude, longitude, x_dist, y_dist, dist, ax, ay, az, w, x, y, z, roll, pitch, yaw");
   Serial.println("OK");
   sendStatusMessage("OK");
 
@@ -280,6 +286,9 @@ void loop() {
     x = BNO::x;
     y = BNO::y;
     z = BNO::z;
+    roll = BNO::roll;
+    pitch = BNO::pitch;
+    yaw = BNO::yaw;
 
     float ln;
     measureData.push_back(altitude);
@@ -291,7 +300,13 @@ void loop() {
     measureData.push_back(ax);
     measureData.push_back(ay); 
     measureData.push_back(az);
-    measureData.push_back(q);
+    measureData.push_back(w);
+    measureData.push_back(x);
+    measureData.push_back(y);
+    measureData.push_back(z);
+    measureData.push_back(roll);
+    measureData.push_back(pitch);
+    measureData.push_back(yaw);
     measureData.push_back(9999); //この値を受け取ったらcsvで改行
 
     Serial.print(altitude, 2);
@@ -310,9 +325,21 @@ void loop() {
     Serial.print(", ");
     Serial.print(ay, 2);
     Serial.print(", ");
-    Serial.println(az, 2);
+    Serial.print(az, 2);
     Serial.print(", ");
-    Serial.println(q, 2);
+    Serial.print(w, 2);
+    Serial.print(", ");
+    Serial.print(x, 2);
+    Serial.print(", ");
+    Serial.print(y, 2);
+    Serial.print(", ");
+    Serial.print(z, 2);
+    Serial.print(", ");
+    Serial.print(roll, 2);
+    Serial.print(", ");
+    Serial.print(pitch, 2);
+    Serial.print(", ");
+    Serial.println(yaw, 2);
 
     // すでに取得済みの変数を元に、JSONフォーマットの文字列を生成
     // (ArduinoJsonライブラリを使用しても良いですが、軽量化のため文字列結合で生成しています)
@@ -322,7 +349,13 @@ void loop() {
     jsonString += "\"ax\":\"" + String(ax, 2) + "\",";
     jsonString += "\"ay\":\"" + String(ay, 2) + "\",";
     jsonString += "\"az\":\"" + String(az, 2) + "\",";
-    jsonString += "\"q\":\"" + String(q, 2) + "\",";
+    jsonString += "\"w\":\"" + String(w, 2) + "\",";
+    jsonString += "\"x\":\"" + String(x, 2) + "\",";
+    jsonString += "\"y\":\"" + String(y, 2) + "\",";
+    jsonString += "\"z\":\"" + String(z, 2) + "\",";
+    jsonString += "\"roll\":\"" + String(roll, 2) + "\",";
+    jsonString += "\"pitch\":\"" + String(pitch, 2) + "\",";
+    jsonString += "\"yaw\":\"" + String(yaw, 2) + "\",";
     jsonString += "\"latitude\":\"" + String(latitude, 6) + "\",";
     jsonString += "\"longitude\":\"" + String(longitude, 6) + "\",";
     jsonString += "\"x_dist\":\"" + String(x_dist, 1) + "\",";
