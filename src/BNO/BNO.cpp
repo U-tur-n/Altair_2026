@@ -2,6 +2,13 @@
 #include "BNO.h"
 
 namespace BNO {
+float ax = 0.0f;
+float ay = 0.0f;
+float az = 0.0f;
+float w = 0.0f;
+float x = 0.0f;
+float y = 0.0f;
+float z = 0.0f;
 
 const uint8_t BNO_I2C_ADDR = 0x28; //0x29だとだめだった
 Adafruit_BNO055 bno = Adafruit_BNO055(-1, BNO_I2C_ADDR, &Wire);
