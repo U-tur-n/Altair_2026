@@ -160,6 +160,22 @@ SPI.begin();
     Serial.println("LittleFS Mount Failed");
     while(1);
   }
+  // 静的ファイル配信より先に、CSVダウンロード用のURLを登録する。
+  server.on("/download", HTTP_GET, [](AsyncWebServerRequest *request) {
+    File file = LittleFS.open(fileName, FILE_READ);
+    if (!file || file.isDirectory()) {
+      request->send(404, "text/plain", "data0.csv not found");
+      return;
+    }
+
+    // trueでContent-Disposition: attachmentを設定し、data0.csvとして保存する。
+    AsyncWebServerResponse *response =
+        request->beginResponse(file, fileName, "text/csv", true);
+    response->addHeader("Cache-Control", "no-store");
+    request->send(response);
+    // 非同期送信の完了までレスポンスがファイルを保持するため、ここではcloseしない。
+  });
+
     server.addHandler(&ws);
 server.serveStatic("/", LittleFS, "/")
       .setDefaultFile("index.html")
