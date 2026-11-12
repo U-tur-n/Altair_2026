@@ -41,6 +41,7 @@ bool last_camera_in_use = false;
 
 std::vector<float> measureData;
 File fp;
+File fp_fs;
 char fileName[] = "/data0.csv";
 
 AsyncWebServer server(80);
@@ -228,11 +229,17 @@ server.serveStatic("/", LittleFS, "/")
   Serial.print("Opening the file...");
     sendStatusMessage("Opening the file...");
   fp = SD.open(fileName, FILE_WRITE);
+  fp_fs = LittleFS.open(fileName, FILE_WRITE);
   if (fp == false) {
     Serial.println("cannot open the file");
     sendStatusMessage("cannot open the file");
   }
+  if (fp_fs == false) {
+    Serial.println("cannot open the file in LittleFS");
+    sendStatusMessage("cannot open the file in LittleFS");
+  }
   fp.println("millis, altitude, latitude, longitude, x_dist, y_dist, dist, ax, ay, az, w, x, y, z, roll, pitch, yaw");
+  fp_fs.println("millis, altitude, latitude, longitude, x_dist, y_dist, dist, ax, ay, az, w, x, y, z, roll, pitch, yaw");
   Serial.println("OK");
   sendStatusMessage("OK");
 
@@ -427,9 +434,12 @@ void save(bool end) {
     {
       if (data == 9999) { // 改行のための特別な値
         fp.println(); // 改行
+        fp_fs.println(); // 改行
       } else {
         fp.print(data);
         fp.print(",");
+        fp_fs.print(data);
+        fp_fs.print(",");
       }
       // fp.print(",");
       // fp.println(data); // q
@@ -441,21 +451,22 @@ void save(bool end) {
     }
   if (end == false) { // データ保存のみ
     fp.flush();
+    fp_fs.flush();
     Serial.println("saved data");
     sendStatusMessage("saved data");
     measureData.clear();
     digitalWrite(SD_CS, HIGH);
   } else {
-   fp.close();
+    fp.close();
+    fp_fs.close();
     isRemoteSdActive = false; // 記録フラグをfalseに戻す
+
     Serial.println("saved data and closed file");
     sendStatusMessage("saved data and closed file");
     measureData.clear();
 
-
-
-  Serial.println("press the tact switch to restart...");
-  sendStatusMessage("press the button to restart...");
+    Serial.println("press the tact switch to restart...");
+    sendStatusMessage("press the button to restart...");
     while (digitalRead(tact) == HIGH && isRemoteSdActive == false) {
       if(camera_in_use != last_camera_in_use){
       sendStatusMessage(camera_in_use ? "Camera is active" : "Camera is inactive");
