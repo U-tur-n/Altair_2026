@@ -64,6 +64,20 @@ function initWebSocket() {
         document.getElementById("ay").innerText = data.ay;
       if (data.az !== undefined)
         document.getElementById("az").innerText = data.az;
+      if (data.w !== undefined)
+        document.getElementById("w").innerText = data.w;
+      if (data.x !== undefined)
+        document.getElementById("x").innerText = data.x;
+      if (data.y !== undefined)
+        document.getElementById("y").innerText = data.y;
+      if (data.z !== undefined)
+        document.getElementById("z").innerText = data.z;
+      if (data.roll !== undefined)
+        document.getElementById("roll").innerText = data.roll;
+      if (data.pitch !== undefined)
+        document.getElementById("pitch").innerText = data.pitch;
+      if (data.yaw !== undefined)
+        document.getElementById("yaw").innerText = data.yaw;
       if (data.latitude !== undefined)
         document.getElementById("alt").innerText = data.altitude;
       if (data.x_dist !== undefined)

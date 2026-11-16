@@ -25,7 +25,13 @@ float dist = GPS::dist;
 float ax;
 float ay;
 float az;
-float q;
+float w;
+float x;
+float y;
+float z;
+float roll;
+float pitch;
+float yaw;
 
 bool isRemoteSdActive = false; //記録開始用フラグ
 bool isRemotePwrActive = false;//電装動作用フラグ
@@ -35,6 +41,7 @@ bool last_camera_in_use = false;
 
 std::vector<float> measureData;
 File fp;
+File fp_fs;
 char fileName[] = "/data0.csv";
 
 AsyncWebServer server(80);
@@ -129,7 +136,7 @@ SPI.begin();
   //SPI衝突回避用
   digitalWrite(SD_CS, HIGH);
 
-
+  Wire.begin();
 
   Serial.begin(115200);
   // while(!Serial);
@@ -153,6 +160,22 @@ SPI.begin();
     Serial.println("LittleFS Mount Failed");
     while(1);
   }
+  // 静的ファイル配信より先に、CSVダウンロード用のURLを登録する。
+  server.on("/download", HTTP_GET, [](AsyncWebServerRequest *request) {
+    File file = LittleFS.open(fileName, FILE_READ);
+    if (!file || file.isDirectory()) {
+      request->send(404, "text/plain", "data0.csv not found");
+      return;
+    }
+
+    // trueでContent-Disposition: attachmentを設定し、data0.csvとして保存する。
+    AsyncWebServerResponse *response =
+        request->beginResponse(file, fileName, "text/csv", true);
+    response->addHeader("Cache-Control", "no-store");
+    request->send(response);
+    // 非同期送信の完了までレスポンスがファイルを保持するため、ここではcloseしない。
+  });
+
     server.addHandler(&ws);
 server.serveStatic("/", LittleFS, "/")
       .setDefaultFile("index.html")
@@ -174,8 +197,12 @@ server.serveStatic("/", LittleFS, "/")
   //SD初期化 
   Serial.print("Initializing SD card...");
   sendStatusMessage("Initializing SD card...");
-
-    
+  if (!SD.begin(SD_CS)) {
+    Serial.println("SD Card not found");
+    sendStatusMessage("SD Card not found");
+    while (1)
+      ;
+  }
   Serial.println("OK");
     sendStatusMessage("OK");
 
@@ -218,10 +245,17 @@ server.serveStatic("/", LittleFS, "/")
   Serial.print("Opening the file...");
     sendStatusMessage("Opening the file...");
   fp = SD.open(fileName, FILE_WRITE);
+  fp_fs = LittleFS.open(fileName, FILE_WRITE);
   if (fp == false) {
     Serial.println("cannot open the file");
     sendStatusMessage("cannot open the file");
   }
+  if (fp_fs == false) {
+    Serial.println("cannot open the file in LittleFS");
+    sendStatusMessage("cannot open the file in LittleFS");
+  }
+  fp.println("millis, altitude, latitude, longitude, x_dist, y_dist, dist, ax, ay, az, w, x, y, z, roll, pitch, yaw");
+  fp_fs.println("millis, altitude, latitude, longitude, x_dist, y_dist, dist, ax, ay, az, w, x, y, z, roll, pitch, yaw");
   Serial.println("OK");
   sendStatusMessage("OK");
 
@@ -271,7 +305,13 @@ void loop() {
     ax = BNO::ax;
     ay = BNO::ay;
     az = BNO::az;
-    q = BNO::q;
+    w = BNO::w;
+    x = BNO::x;
+    y = BNO::y;
+    z = BNO::z;
+    roll = BNO::roll;
+    pitch = BNO::pitch;
+    yaw = BNO::yaw;
 
     float ln;
     measureData.push_back(altitude);
@@ -283,7 +323,13 @@ void loop() {
     measureData.push_back(ax);
     measureData.push_back(ay); 
     measureData.push_back(az);
-    measureData.push_back(q);
+    measureData.push_back(w);
+    measureData.push_back(x);
+    measureData.push_back(y);
+    measureData.push_back(z);
+    measureData.push_back(roll);
+    measureData.push_back(pitch);
+    measureData.push_back(yaw);
     measureData.push_back(9999); //この値を受け取ったらcsvで改行
 
     Serial.print(altitude, 2);
@@ -302,9 +348,21 @@ void loop() {
     Serial.print(", ");
     Serial.print(ay, 2);
     Serial.print(", ");
-    Serial.println(az, 2);
+    Serial.print(az, 2);
     Serial.print(", ");
-    Serial.println(q, 2);
+    Serial.print(w, 2);
+    Serial.print(", ");
+    Serial.print(x, 2);
+    Serial.print(", ");
+    Serial.print(y, 2);
+    Serial.print(", ");
+    Serial.print(z, 2);
+    Serial.print(", ");
+    Serial.print(roll, 2);
+    Serial.print(", ");
+    Serial.print(pitch, 2);
+    Serial.print(", ");
+    Serial.println(yaw, 2);
 
     // すでに取得済みの変数を元に、JSONフォーマットの文字列を生成
     // (ArduinoJsonライブラリを使用しても良いですが、軽量化のため文字列結合で生成しています)
@@ -314,7 +372,13 @@ void loop() {
     jsonString += "\"ax\":\"" + String(ax, 2) + "\",";
     jsonString += "\"ay\":\"" + String(ay, 2) + "\",";
     jsonString += "\"az\":\"" + String(az, 2) + "\",";
-    jsonString += "\"q\":\"" + String(q, 2) + "\",";
+    jsonString += "\"w\":\"" + String(w, 2) + "\",";
+    jsonString += "\"x\":\"" + String(x, 2) + "\",";
+    jsonString += "\"y\":\"" + String(y, 2) + "\",";
+    jsonString += "\"z\":\"" + String(z, 2) + "\",";
+    jsonString += "\"roll\":\"" + String(roll, 2) + "\",";
+    jsonString += "\"pitch\":\"" + String(pitch, 2) + "\",";
+    jsonString += "\"yaw\":\"" + String(yaw, 2) + "\",";
     jsonString += "\"latitude\":\"" + String(latitude, 6) + "\",";
     jsonString += "\"longitude\":\"" + String(longitude, 6) + "\",";
     jsonString += "\"x_dist\":\"" + String(x_dist, 1) + "\",";
@@ -357,12 +421,23 @@ void loop() {
   if (isRemoteSdActive) {
   }
 
-  if (isRemotePwrActive != lastRemotePwrActive) {
-    servo::execute();
-    Serial.println("Servo is operating");
-    sendStatusMessage("Servo is operating");
-    lastRemotePwrActive = isRemotePwrActive;
-  }
+if (isRemotePwrActive != lastRemotePwrActive) {
+  Serial.println("[SERVO] begin");
+
+  // バッテリー側の負荷を下げてから動作
+  // WiFi.softAPdisconnect(true);
+  // WiFi.mode(WIFI_OFF);
+  // delay(100);
+
+  servo::execute();
+
+  lastRemotePwrActive = isRemotePwrActive;
+  Serial.println("[SERVO] end");
+
+  // アクセスポイントを復帰
+  // WiFi.mode(WIFI_AP);
+  // WiFi.softAP(ssid);
+}
 
   // リモートSD記録がONの場合、指定間隔でタイムラプスを保存
 }
@@ -373,6 +448,15 @@ void save(bool end) {
   digitalWrite(SD_CS, LOW);
     for (double data : measureData)
     {
+      if (data == 9999) { // 改行のための特別な値
+        fp.println(); // 改行
+        fp_fs.println(); // 改行
+      } else {
+        fp.print(data);
+        fp.print(",");
+        fp_fs.print(data);
+        fp_fs.print(",");
+      }
       // fp.print(",");
       // fp.println(data); // q
       // Serial.println("receive any key...");
@@ -382,20 +466,23 @@ void save(bool end) {
       // }
     }
   if (end == false) { // データ保存のみ
+    fp.flush();
+    fp_fs.flush();
     Serial.println("saved data");
     sendStatusMessage("saved data");
     measureData.clear();
     digitalWrite(SD_CS, HIGH);
   } else {
+    fp.close();
+    fp_fs.close();
     isRemoteSdActive = false; // 記録フラグをfalseに戻す
+
     Serial.println("saved data and closed file");
     sendStatusMessage("saved data and closed file");
     measureData.clear();
 
-
-
-  Serial.println("press the tact switch to restart...");
-  sendStatusMessage("press the button to restart...");
+    Serial.println("press the tact switch to restart...");
+    sendStatusMessage("press the button to restart...");
     while (digitalRead(tact) == HIGH && isRemoteSdActive == false) {
       if(camera_in_use != last_camera_in_use){
       sendStatusMessage(camera_in_use ? "Camera is active" : "Camera is inactive");
