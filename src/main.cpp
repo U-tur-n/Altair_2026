@@ -258,8 +258,7 @@ server.serveStatic("/", LittleFS, "/")
     while (1)
       ;
   }
-  fp.println("millis, altitude, latitude, longitude, x_dist, y_dist, dist, ax, ay, az, w, x, y, z, roll, pitch, yaw");
-  fp_fs.println("millis, altitude, latitude, longitude, x_dist, y_dist, dist, ax, ay, az, w, x, y, z, roll, pitch, yaw");
+
   Serial.println("OK");
   sendStatusMessage("OK");
 
@@ -278,6 +277,8 @@ void loop() {
   }
 }
 if (isRemoteSdActive == true && lastRemoteSdActive == false) {
+  fp.println("millis, altitude, latitude, longitude, x_dist, y_dist, dist, ax, ay, az, w, x, y, z, roll, pitch, yaw");
+  fp_fs.println("millis, altitude, latitude, longitude, x_dist, y_dist, dist, ax, ay, az, w, x, y, z, roll, pitch, yaw");
   Serial.println("start");
   sendStatusMessage("start");
   lastRemoteSdActive = true;
