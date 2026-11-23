@@ -244,20 +244,6 @@ server.serveStatic("/", LittleFS, "/")
   //ボーレートを115200
 
     //タクトスイッチが押されたら計測開始
-  Serial.print("Opening the file...");
-    sendStatusMessage("Opening the file...");
-  fp = SD.open(fileName, FILE_WRITE);
-  fp_fs = LittleFS.open(fileName, FILE_WRITE);
-  if (fp == false) {
-    Serial.println("cannot open the file");
-    sendStatusMessage("cannot open the file");
-  }
-  if (fp_fs == false) {
-    Serial.println("cannot open the file in LittleFS");
-    sendStatusMessage("cannot open the file in LittleFS");
-    while (1)
-      ;
-  }
 
   Serial.println("OK");
   sendStatusMessage("OK");
@@ -277,6 +263,20 @@ void loop() {
   }
 }
 if (isRemoteSdActive == true && lastRemoteSdActive == false) {
+    Serial.print("Opening the file...");
+    sendStatusMessage("Opening the file...");
+  fp = SD.open(fileName, FILE_WRITE);
+  fp_fs = LittleFS.open(fileName, FILE_WRITE);
+  if (fp_fs == false) {
+    Serial.println("cannot open the file in LittleFS");
+    sendStatusMessage("cannot open the file in LittleFS");
+    if (fp == false) {
+      Serial.println("cannot open the file");
+      sendStatusMessage("cannot open the file");
+      while (1)
+        ;
+    }
+  }
   fp.println("millis, altitude, latitude, longitude, x_dist, y_dist, dist, ax, ay, az, w, x, y, z, roll, pitch, yaw");
   fp_fs.println("millis, altitude, latitude, longitude, x_dist, y_dist, dist, ax, ay, az, w, x, y, z, roll, pitch, yaw");
   Serial.println("start");
@@ -319,6 +319,8 @@ lastTactState = digitalRead(tact);
 
     float ln;
     if (isRemoteSdActive == true){
+    measureData.push_back(millis());
+    Serial.print(", ");
     measureData.push_back(altitude);
     measureData.push_back(latitude);
     measureData.push_back(longitude);
