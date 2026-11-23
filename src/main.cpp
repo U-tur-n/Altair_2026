@@ -293,9 +293,6 @@ lastRemoteSdActive = isRemoteSdActive;
 lastTactState = digitalRead(tact);
 
   if(millis() - lastTime >= 50){
-    measureData.push_back(millis());
-    Serial.print(millis());
-    Serial.print(", ");
 
     BME::execute();
     GPS::execute();
@@ -317,7 +314,7 @@ lastTactState = digitalRead(tact);
     pitch = BNO::pitch;
     yaw = BNO::yaw;
 
-    float ln;
+    Serial.print(millis());
     if (isRemoteSdActive == true){
     measureData.push_back(millis());
     Serial.print(", ");
