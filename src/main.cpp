@@ -36,6 +36,8 @@ float yaw;
 bool isRemoteSdActive = false; //記録開始用フラグ
 bool isRemotePwrActive = false;//電装動作用フラグ
 bool lastRemotePwrActive = false;
+bool lastRemoteSdActive = false;
+bool lastTactState = HIGH;
 
 bool last_camera_in_use = false;
 
@@ -253,19 +255,17 @@ server.serveStatic("/", LittleFS, "/")
   if (fp_fs == false) {
     Serial.println("cannot open the file in LittleFS");
     sendStatusMessage("cannot open the file in LittleFS");
+    while (1)
+      ;
   }
   fp.println("millis, altitude, latitude, longitude, x_dist, y_dist, dist, ax, ay, az, w, x, y, z, roll, pitch, yaw");
   fp_fs.println("millis, altitude, latitude, longitude, x_dist, y_dist, dist, ax, ay, az, w, x, y, z, roll, pitch, yaw");
   Serial.println("OK");
   sendStatusMessage("OK");
 
-  Serial.println("press the tact switch...");
-  sendStatusMessage("press the button...");
+  Serial.println("press the tact switch to start SD recording...");
+  sendStatusMessage("press the button to start SD recording...");
   while(digitalRead(tact) == HIGH && isRemoteSdActive == false) {
-    if(camera_in_use != last_camera_in_use){
-      sendStatusMessage(camera_in_use ? "Camera is active" : "Camera is inactive");
-      last_camera_in_use = camera_in_use;
-    }
     String jsonString = "{";
     jsonString += "\"sd_active\":" + String(isRemoteSdActive ? "true" : "false") + ",";
     jsonString += "\"cam_active\":" + String(camera_in_use ? "true" : "false");
@@ -288,6 +288,29 @@ server.serveStatic("/", LittleFS, "/")
 void loop() {
   // put your main code here, to run repeatedly:
   ws.cleanupClients();
+
+  if (digitalRead(tact) == LOW && lastTactState == HIGH) {
+  delay(5);
+  if (digitalRead(tact) == LOW) {
+    isRemoteSdActive = !isRemoteSdActive; // true/falseを反転
+  }
+}
+if (isRemoteSdActive == true && lastRemoteSdActive == false) {
+  Serial.println("start");
+  sendStatusMessage("start");
+  lastRemoteSdActive = true;
+}
+if(isRemoteSdActive == false){
+      Serial.println("stop");
+      sendStatusMessage("stop");
+      save(true);
+}
+    if(measureData.size() >= 5000){
+      save(false);
+    }
+lastRemoteSdActive = isRemoteSdActive;
+lastTactState = digitalRead(tact);
+
   if(millis() - lastTime >= 50){
     measureData.push_back(millis());
     Serial.print(millis());
@@ -314,6 +337,7 @@ void loop() {
     yaw = BNO::yaw;
 
     float ln;
+    if (isRemoteSdActive == true){
     measureData.push_back(altitude);
     measureData.push_back(latitude);
     measureData.push_back(longitude);
@@ -331,6 +355,7 @@ void loop() {
     measureData.push_back(pitch);
     measureData.push_back(yaw);
     measureData.push_back(9999); //この値を受け取ったらcsvで改行
+  }
 
     Serial.print(altitude, 2);
     Serial.print(", ");
@@ -401,19 +426,6 @@ void loop() {
       last_camera_in_use = camera_in_use;
     }
 
-    if(digitalRead(tact) == LOW || isRemoteSdActive == false){
-      Serial.println("stop");
-      sendStatusMessage("stop");
-      
-    
-  while(digitalRead(tact) == LOW)
-  ;
-      save(true);
-    }
-
-    if(measureData.size() >= 5000){
-      save(false);
-    }
     
   lastTime = millis();
   }
@@ -483,29 +495,6 @@ void save(bool end) {
 
     Serial.println("press the tact switch to restart...");
     sendStatusMessage("press the button to restart...");
-    while (digitalRead(tact) == HIGH && isRemoteSdActive == false) {
-      if(camera_in_use != last_camera_in_use){
-      sendStatusMessage(camera_in_use ? "Camera is active" : "Camera is inactive");
-      last_camera_in_use = camera_in_use;
-    }
-    String jsonString = "{";
-    jsonString += "\"sd_active\":" + String(isRemoteSdActive ? "true" : "false") + ",";
-    jsonString += "\"cam_active\":" + String(camera_in_use ? "true" : "false");
-    jsonString += "}";
-
-    // 接続されているすべてのブラウザへデータを送信
-    ws.textAll(jsonString);
-      delay(50);
-    }
-    delay(10);
-  while(digitalRead(tact) == LOW)
-  ;
-  isRemoteSdActive = true; // リモートSD記録フラグを強制的にtrueに設定
-        String jsonString = "{";
-    jsonString += "\"sd_active\":" + String(isRemoteSdActive ? "true" : "false") + ",";
-    jsonString += "\"cam_active\":" + String(camera_in_use ? "true" : "false");
-    jsonString += "}";
-    ws.textAll(jsonString);
-  sendStatusMessage("start");
-}
+    lastTactState = digitalRead(tact);
+  }
 }
