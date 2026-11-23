@@ -288,9 +288,7 @@ if(isRemoteSdActive == false && lastRemoteSdActive == true){
       sendStatusMessage("stop");
       save(true);
 }
-    if(measureData.size() >= 5000){
-      save(false);
-    }
+
 lastRemoteSdActive = isRemoteSdActive;
 lastTactState = digitalRead(tact);
 
@@ -409,6 +407,9 @@ lastTactState = digitalRead(tact);
       last_camera_in_use = camera_in_use;
     }
 
+    if(measureData.size() >= 5000){
+      save(false);
+    }
     
   lastTime = millis();
   }
