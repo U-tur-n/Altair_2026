@@ -265,24 +265,6 @@ server.serveStatic("/", LittleFS, "/")
 
   Serial.println("press the tact switch to start SD recording...");
   sendStatusMessage("press the button to start SD recording...");
-  while(digitalRead(tact) == HIGH && isRemoteSdActive == false) {
-    String jsonString = "{";
-    jsonString += "\"sd_active\":" + String(isRemoteSdActive ? "true" : "false") + ",";
-    jsonString += "\"cam_active\":" + String(camera_in_use ? "true" : "false");
-    jsonString += "}";
-    ws.textAll(jsonString);
-    delay(50);
-  }
-  delay(10);
-  while(digitalRead(tact) == LOW)
-  ;
-  isRemoteSdActive = true; // リモートSD記録フラグを強制的にtrueに設定
-        String jsonString = "{";
-    jsonString += "\"sd_active\":" + String(isRemoteSdActive ? "true" : "false") + ",";
-    jsonString += "\"cam_active\":" + String(camera_in_use ? "true" : "false");
-    jsonString += "}";
-    ws.textAll(jsonString);
-  sendStatusMessage("start");
 }
 
 void loop() {
@@ -300,7 +282,7 @@ if (isRemoteSdActive == true && lastRemoteSdActive == false) {
   sendStatusMessage("start");
   lastRemoteSdActive = true;
 }
-if(isRemoteSdActive == false){
+if(isRemoteSdActive == false && lastRemoteSdActive == true){
       Serial.println("stop");
       sendStatusMessage("stop");
       save(true);
@@ -450,8 +432,8 @@ if (isRemotePwrActive != lastRemotePwrActive) {
   // WiFi.mode(WIFI_AP);
   // WiFi.softAP(ssid);
 }
-
-  // リモートSD記録がONの場合、指定間隔でタイムラプスを保存
+delay(5);
+// リモートSD記録がONの場合、指定間隔でタイムラプスを保存
 }
 
 // put function definitions here:
