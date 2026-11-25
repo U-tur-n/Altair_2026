@@ -265,8 +265,8 @@ void loop() {
 if (isRemoteSdActive == true && lastRemoteSdActive == false) {
     Serial.print("Opening the file...");
     sendStatusMessage("Opening the file...");
-  fp = SD.open(fileName, FILE_WRITE);
-  fp_fs = LittleFS.open(fileName, FILE_WRITE);
+  fp = SD.open(fileName, FILE_APPEND);
+  fp_fs = LittleFS.open(fileName, FILE_APPEND);
   if (fp_fs == false) {
     Serial.println("cannot open the file in LittleFS");
     sendStatusMessage("cannot open the file in LittleFS");
