@@ -3,6 +3,7 @@
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include <LittleFS.h>
+#include <time.h>
 #include <vector>
 #include "BME/BME.h"
 #include "BNO/BNO.h"
@@ -123,6 +124,123 @@ void initWebSocket() {
   server.addHandler(&ws);
 }
 
+static bool isCsvName(const String &name) {
+  for (unsigned char c : name) {
+    if (c < 32 || c == 127 || c == '/' || c == '\\') {
+      return false;
+    }
+  }
+  String lower = name;
+  lower.toLowerCase();
+  return lower.endsWith(".csv");
+}
+
+static String encodeFilename(const String &name) {
+  String encoded;
+  for (unsigned char c : name) {
+    if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
+        (c >= '0' && c <= '9') || c == '-' || c == '_' || c == '.') {
+      encoded += static_cast<char>(c);
+    } else {
+      char escaped[4];
+      snprintf(escaped, sizeof(escaped), "%%%02X", static_cast<unsigned int>(c));
+      encoded += escaped;
+    }
+  }
+  return encoded;
+}
+
+static void printFilename(Print &out, const String &name) {
+  for (char c : name) {
+    switch (c) {
+      case '&': out.print("&amp;"); break;
+      case '<': out.print("&lt;"); break;
+      case '>': out.print("&gt;"); break;
+      default: out.print(c); break;
+    }
+  }
+}
+
+static void showCsvList(AsyncWebServerRequest *request) {
+  File root = LittleFS.open("/");
+  if (!root || !root.isDirectory()) {
+    request->send(500, "text/plain; charset=utf-8", "CSV一覧を読み込めませんでした。");
+    return;
+  }
+
+  auto *response = request->beginResponseStream("text/html; charset=utf-8");
+  response->addHeader("Cache-Control", "no-store");
+  response->print(
+      "<!doctype html><html lang=\"ja\"><head><meta charset=\"utf-8\">"
+      "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+      "<title>CSV一覧</title><link rel=\"stylesheet\" href=\"/style.css\"></head>"
+      "<body class=\"csv-page\"><main><a href=\"/\">ダッシュボードに戻る</a>"
+      "<h1>CSV一覧</h1><table><thead><tr><th scope=\"col\">ファイル名</th>"
+      "<th scope=\"col\">更新日時（日本時間）</th></tr></thead><tbody>");
+
+  bool found = false;
+  for (File file = root.openNextFile(); file; file = root.openNextFile()) {
+    const String name = file.name();
+    if (file.isDirectory() || !isCsvName(name)) {
+      continue;
+    }
+
+    found = true;
+    response->print("<tr><td><a href=\"/download?file=");
+    response->print(encodeFilename(name));
+    response->print("\" download>");
+    printFilename(*response, name);
+    response->print("</a></td><td>");
+
+    const time_t modified = file.getLastWrite();
+    // 時計の未設定時に付く1970年の値を実際の更新日時として表示しない。
+    constexpr time_t firstValidTimestamp = 946684800; // 2000-01-01 UTC
+    constexpr time_t jstOffset = 9 * 60 * 60;
+    const time_t modifiedJst = modified + jstOffset;
+    struct tm localDate;
+    char date[24];
+    if (modified >= firstValidTimestamp && gmtime_r(&modifiedJst, &localDate) &&
+        strftime(date, sizeof(date), "%Y-%m-%d %H:%M:%S", &localDate)) {
+      response->print(date);
+    } else {
+      response->print("不明");
+    }
+    response->print("</td></tr>");
+  }
+
+  if (!found) {
+    response->print("<tr><td colspan=\"2\">ダウンロードできるCSVはありません。</td></tr>");
+  }
+  response->print("</tbody></table></main></body></html>");
+  request->send(response);
+}
+
+static void downloadCsv(AsyncWebServerRequest *request) {
+  String path = fileName;
+  const auto *param = request->getParam("file");
+  if (param) {
+    if (!isCsvName(param->value())) {
+      request->send(400, "text/plain", "Invalid CSV filename");
+      return;
+    }
+    path = "/" + param->value();
+  }
+
+  File file = LittleFS.open(path, FILE_READ);
+  if (!file || file.isDirectory()) {
+    request->send(404, "text/plain", "CSV file not found");
+    return;
+  }
+
+  // レスポンスが非同期送信の完了までファイルを保持する。
+  auto *response = request->beginResponse(file, path, "text/csv", true);
+  if (param) {
+    response->addHeader("Content-Disposition",
+                        "attachment; filename*=UTF-8''" + encodeFilename(param->value()));
+  }
+  response->addHeader("Cache-Control", "no-store");
+  request->send(response);
+}
 
 // put function declarations here:
 void save(bool);
@@ -162,21 +280,8 @@ SPI.begin();
     Serial.println("LittleFS Mount Failed");
     while(1);
   }
-  // 静的ファイル配信より先に、CSVダウンロード用のURLを登録する。
-  server.on("/download", HTTP_GET, [](AsyncWebServerRequest *request) {
-    File file = LittleFS.open(fileName, FILE_READ);
-    if (!file || file.isDirectory()) {
-      request->send(404, "text/plain", "data0.csv not found");
-      return;
-    }
-
-    // trueでContent-Disposition: attachmentを設定し、data0.csvとして保存する。
-    AsyncWebServerResponse *response =
-        request->beginResponse(file, fileName, "text/csv", true);
-    response->addHeader("Cache-Control", "no-store");
-    request->send(response);
-    // 非同期送信の完了までレスポンスがファイルを保持するため、ここではcloseしない。
-  });
+  server.on("/csv", HTTP_GET, showCsvList);
+  server.on("/download", HTTP_GET, downloadCsv);
 
     server.addHandler(&ws);
 server.serveStatic("/", LittleFS, "/")

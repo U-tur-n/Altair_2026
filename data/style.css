@@ -143,3 +143,45 @@ background-color: #333; /* 読み込み前の背景色（黒寄り） */
     font-size: 18px;
     font-weight: bold;
 }
+
+.csv-button {
+    display: inline-block;
+    align-self: flex-start;
+    margin-bottom: 15px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background-color: #a4c2f4;
+    color: #01061f;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.csv-page {
+    background-color: #000;
+    color: #fff;
+    line-height: 1.5;
+}
+
+.csv-page main {
+    width: min(100%, 680px);
+    padding: 16px;
+    border-radius: 12px;
+    background-color: #01061f;
+}
+
+.csv-page a {
+    color: #a4c2f4;
+}
+
+.csv-page table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.csv-page th,
+.csv-page td {
+    padding: 8px;
+    border-bottom: 1px solid #20337a;
+    text-align: left;
+    overflow-wrap: anywhere;
+}
