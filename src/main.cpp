@@ -76,17 +76,17 @@ AwsFrameInfo *info = (AwsFrameInfo*)arg;
     Serial.println(message);
 
     // --- メッセージの内容に応じて変数を変更 ---
-if (message == "CMD_SD" ) { //|| isRemoteSdActive==true
-      unsigned long CMD_SDlasttime;
-    if (millis() - CMD_SDlasttime > 1000){
-      isRemoteSdActive = !isRemoteSdActive; // true/falseを反転
-      Serial.print("SD記録フラグが変更されました: ");
-      Serial.println(isRemoteSdActive ? "ON" : "OFF");
-      CMD_SDlasttime = millis();
-
-      // ここにSD記録開始の処理や save() 関数を呼び出す処理を書くことができます
+    if (message == "CMD_SD") {
+      constexpr unsigned long commandIntervalMs = 1000;
+      const unsigned long now = millis();
+      static unsigned long lastSdCommandTime = now - commandIntervalMs;
+      if (now - lastSdCommandTime >= commandIntervalMs) {
+        lastSdCommandTime = now;
+        isRemoteSdActive = !isRemoteSdActive;
+        Serial.print("SD記録フラグが変更されました: ");
+        Serial.println(isRemoteSdActive ? "ON" : "OFF");
+      }
     }
-    } 
     else if (message == "CMD_PWR") {
       unsigned long CMD_PWRlasttime = 0;
       if (millis() - CMD_PWRlasttime > 1000) {
